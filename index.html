@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Karta Drive</title>
+<meta name="theme-color" content="#0B5CAD">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Karta Drive">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: agenda-app. Kop met maand, navigatie en Dag/Week/Maand; daaronder een samenvatting van de gekozen periode; daaronder het rooster waar je op een tijdstip klikt om een les te maken. */
+:root {
+  --bg: #F2F3F0;
+  --surface: #FFFFFF;
+  --ink: #15202B;
+  --muted: #5B6773;
+  --line: #E0E3DE;
+  --line-strong: #CBD0CA;
+  --accent: #0B5CAD;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E3EEF9;
+  --work-bg: #D6E6F7;
+  --work-ink: #0A3F7A;
+  --own-bg: #FBE2BE;
+  --own-ink: #7A4300;
+  --workE-bg: #CDEEE8;
+  --workE-ink: #0A5A50;
+  --ownE-bg: #F7D3CC;
+  --ownE-ink: #8A2B1F;
+  --now: #D93025;
+  --danger: #B3261E;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161C; --surface: #19212A; --ink: #E7ECF0; --muted: #9AA7B3; --line: #26303B; --line-strong: #36424F;
+    --accent: #5FA6F2; --accent-ink: #08121C; --accent-soft: #16293D;
+    --work-bg: #1F3B5A; --work-ink: #A9D0F7; --own-bg: #4A3412; --own-ink: #F2C788;
+    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE;
+    --now: #FF6B5F; --danger: #F2867F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161C; --surface: #19212A; --ink: #E7ECF0; --muted: #9AA7B3; --line: #26303B; --line-strong: #36424F;
+  --accent: #5FA6F2; --accent-ink: #08121C; --accent-soft: #16293D;
+  --work-bg: #1F3B5A; --work-ink: #A9D0F7; --own-bg: #4A3412; --own-ink: #F2C788;
+    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE;
+  --now: #FF6B5F; --danger: #F2867F;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+:root { color-scheme: light; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.45 var(--font-body);
+  padding-block: 16px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.title { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.title h1 { font: 700 32px/1 var(--font-display); margin: 0; text-transform: capitalize; }
+.title small { color: var(--muted); font-weight: 500; }
+.title { position: relative; }
+.ttlbtn { font: inherit; color: inherit; background: transparent; border: 0; padding: 2px 8px; margin-left: -8px; border-radius: 8px; text-transform: inherit; text-align: left; }
+.ttlbtn:hover, .ttlbtn[aria-expanded="true"] { background: var(--accent-soft); }
+.car { font-size: .6em; color: var(--accent); vertical-align: .15em; }
+.pick { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: 296px; max-width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .2); font-size: 14px; font-weight: 400; text-transform: none; color: var(--ink); }
+.pick[hidden] { display: none; }
+.ph { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; text-transform: capitalize; }
+.pg { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.pw { text-align: center; font: 600 11px/1 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 6px 0; }
+.pd { position: relative; aspect-ratio: 1; border: 0; background: transparent; border-radius: 50%; padding: 0; font-size: 14px; }
+.pd:hover { background: var(--accent-soft); }
+.pd.out { color: var(--muted); opacity: .6; }
+.pd.today { color: var(--accent); font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--accent); }
+.pd.sel { background: var(--accent); color: var(--accent-ink); font-weight: 700; opacity: 1; }
+.pdot { position: absolute; left: 50%; bottom: 4px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor; opacity: .7; }
+.pf { margin-top: 8px; display: flex; justify-content: flex-end; }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.btn { border: 1px solid var(--line-strong); background: var(--surface); border-radius: 8px; padding: 7px 12px; line-height: 1.2; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.btn.danger { color: var(--danger); }
+.btn.ghost { border-color: transparent; background: transparent; }
+.btn.ghost:hover { background: var(--accent-soft); }
+.nav { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.nav button { border: 0; background: transparent; padding: 7px 12px; }
+.nav button + button { border-left: 1px solid var(--line-strong); }
+.nav button:hover { background: var(--accent-soft); }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 7px 12px; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+.sum { display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: baseline; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+.sum .f { display: flex; align-items: baseline; gap: 8px; }
+.sum .lbl { font: 600 11px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.sum .val { font: 700 28px/1 var(--font-display); }
+.sum .split { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+.dot.work { background: var(--work-ink); }
+.dot.own { background: var(--own-ink); }
+
+.cal { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.scroll { overflow: auto; height: clamp(420px, 68vh, 760px); }
+.calhead, .calbody { display: grid; }
+.calhead { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line-strong); }
+.hd { border: 0; background: transparent; padding: 8px 4px 8px; text-align: center; border-left: 1px solid var(--line); }
+.hd:hover { background: var(--accent-soft); }
+.hd .dn { font: 600 12px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+.hd .num { font: 600 20px/1 var(--font-display); display: inline-grid; place-items: center; min-width: 30px; height: 30px; border-radius: 99px; padding: 0 4px; }
+.hd.today .num { background: var(--accent); color: var(--accent-ink); }
+.hd.today .dn { color: var(--accent); }
+.hd .mini { display: block; font-size: 10.5px; color: var(--muted); height: 14px; margin-top: 2px; white-space: nowrap; }
+.corner, .gut { position: sticky; left: 0; background: var(--surface); z-index: 4; }
+.corner { border: 0; }
+.gut { position: sticky; left: 0; height: calc(var(--hrs) * var(--hpx)); }
+.gut span { position: absolute; right: 6px; font-size: 11px; color: var(--muted); transform: translateY(-50%); }
+.col { position: relative; border-left: 1px solid var(--line); height: calc(var(--hrs) * var(--hpx)); cursor: pointer;
+  background-image: repeating-linear-gradient(to bottom, var(--line) 0, var(--line) 1px, transparent 1px, transparent var(--hpx)); }
+.col:hover { background-color: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.blk { position: absolute; border: 0; border-radius: 7px; padding: 3px 6px; text-align: left; overflow: hidden; font-size: 12px; line-height: 1.25; }
+.blk.work { background: var(--work-bg); color: var(--work-ink); }
+.blk.own { background: var(--own-bg); color: var(--own-ink); }
+.blk.work.enkel { background: var(--workE-bg); color: var(--workE-ink); }
+.blk.own.enkel { background: var(--ownE-bg); color: var(--ownE-ink); }
+.blk:hover { filter: brightness(.96); }
+.blk b { display: block; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.blk span { display: block; opacity: .85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nowline { position: absolute; left: 0; right: 0; height: 2px; background: var(--now); z-index: 3; pointer-events: none; }
+.nowline::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--now); }
+
+.month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.mh { padding: 8px 6px; text-align: center; font: 600 12px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line-strong); }
+.mc { min-height: 104px; border: 0; border-left: 1px solid var(--line); border-top: 1px solid var(--line); background: transparent; padding: 6px; text-align: left; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.mc:nth-child(7n+8) { border-left: 0; }
+.mc:hover { background: var(--accent-soft); }
+.mc.out { opacity: .45; }
+.mc .top { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+.mc .d { font: 600 15px/1 var(--font-display); display: inline-grid; place-items: center; min-width: 24px; height: 24px; border-radius: 99px; }
+.mc.today .d { background: var(--accent); color: var(--accent-ink); }
+.mc .hrs { font-size: 11px; color: var(--muted); }
+.pill { font-size: 11px; line-height: 1.2; border-radius: 4px; padding: 2px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pill.work { background: var(--work-bg); color: var(--work-ink); }
+.pill.own { background: var(--own-bg); color: var(--own-ink); }
+.pill.work.enkel { background: var(--workE-bg); color: var(--workE-ink); }
+.pill.own.enkel { background: var(--ownE-bg); color: var(--ownE-ink); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid var(--line-strong); }
+.sw.work { background: var(--work-bg); } .sw.own { background: var(--own-bg); }
+.sw.work.enkel { background: var(--workE-bg); } .sw.own.enkel { background: var(--ownE-bg); }
+.more { font-size: 11px; color: var(--muted); }
+.mc .pills { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+.ov { position: fixed; inset: 0; background: rgba(10, 16, 22, .5); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.ov[hidden] { display: none; }
+.card { background: var(--surface); width: 100%; max-width: 460px; max-height: 92vh; overflow: auto; border-radius: 14px; border: 1px solid var(--line); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.card h2 { font: 700 24px/1 var(--font-display); margin: 0; }
+.fld { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.fld > label, .fld > .l { font: 600 12px/1 var(--font-body); color: var(--muted); }
+.fld input[type="text"], .fld input[type="time"], .fld input[type="date"], .fld input[type="number"] { width: 100%; padding: 9px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { border: 1px solid var(--line-strong); background: var(--surface); border-radius: 99px; padding: 6px 13px; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.chips input { width: 5.5rem !important; }
+.total { display: flex; justify-content: space-between; align-items: baseline; background: var(--bg); border-radius: 10px; padding: 10px 12px; }
+.total b { font: 700 26px/1 var(--font-display); }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.acts .sp { flex: 1; }
+.err { color: var(--danger); font-size: 13px; }
+.hint { font-size: 12px; color: var(--muted); }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 99px; z-index: 60; font-size: 14px; }
+.toast[hidden] { display: none; }
+.status { padding: 40px 16px; text-align: center; color: var(--muted); }
+
+@media (max-width: 640px) {
+  .title h1 { font-size: 26px; }
+  .sum .val { font-size: 24px; }
+  .mc { min-height: 64px; padding: 4px; }
+  .mc .pill { font-size: 0; padding: 0; width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .mc .pills { flex-direction: row; flex-wrap: wrap; }
+  .mc .hrs { display: none; }
+  .ov { place-items: end center; padding: 0; }
+  .card { border-radius: 16px 16px 0 0; max-height: 94vh; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+}
+.home { display: inline-flex; align-items: center; gap: 6px; }
+.home svg { width: 16px; height: 16px; }
+.home[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.year { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ymo { border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: transparent; text-align: left; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ymo:hover { background: var(--accent-soft); }
+.yh { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; }
+.ymn { font: 700 22px/1 var(--font-display); text-transform: capitalize; }
+.ymo.cur .ymn { color: var(--accent); }
+.yeur { font: 600 15px/1 var(--font-body); }
+.yeur.zero { color: var(--muted); font-weight: 400; }
+.ygrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px 0; text-align: center; }
+.yd { font-size: 12px; line-height: 22px; height: 22px; }
+.yd.has { font-weight: 700; color: var(--accent); }
+.yd.today { background: var(--accent); color: var(--accent-ink); border-radius: 50%; width: 22px; justify-self: center; font-weight: 700; }
+.ysub { font-size: 12px; color: var(--muted); }
+.weeks { border-top: 1px solid var(--line-strong); padding-bottom: 6px; }
+.wkhead { font: 600 11px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 14px 16px 8px; }
+.wk { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) 6rem 10rem 6rem; gap: 8px; align-items: center; width: 100%; border: 0; border-top: 1px solid var(--line); background: transparent; text-align: left; padding: 10px 16px; }
+.wk:hover { background: var(--accent-soft); }
+.wkn { font-weight: 600; }
+.wkd, .wkl, .wkmin { color: var(--muted); }
+.wkm { text-align: right; font-weight: 600; }
+.wkmin { text-align: right; }
+@media (max-width: 900px) { .year { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .ymo { padding: 12px 10px; }
+  .ymn { font-size: 19px; }
+  .wk { grid-template-columns: 4.6rem minmax(0, 1fr) auto; }
+  .wkd, .wkl { display: none; }
+  .wkmin { text-align: left; }
+}
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="title"><h1><button class="ttlbtn" id="ttlbtn" aria-haspopup="dialog" aria-expanded="false"><span id="ttl"></span> <span class="car" aria-hidden="true">▾</span></button></h1><small id="sub"></small><div class="pick" id="pick" role="dialog" aria-label="Datum kiezen" hidden></div></div>
+    <div class="tools">
+      <button class="btn home" id="home" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+      <div class="nav"><button id="prev" aria-label="Vorige">‹</button><button id="today" aria-haspopup="dialog" aria-expanded="false">Vandaag</button><button id="next" aria-label="Volgende">›</button></div>
+      <div class="seg" id="views">
+        <button data-v="day" aria-pressed="false">Dag</button>
+        <button data-v="week" aria-pressed="true">Week</button>
+        <button data-v="month" aria-pressed="false">Maand</button>
+      </div>
+      <button class="btn primary" id="add">+ Les</button>
+      <button class="btn ghost" id="cfg" aria-label="Back-up">Back-up</button>
+    </div>
+  </header>
+  <section class="sum" id="sum" aria-label="Samenvatting"></section>
+  <div class="legend" id="legend" aria-label="Kleuren">
+    <span><i class="sw work"></i>Ruzgar blokuur</span><span><i class="sw work enkel"></i>Ruzgar enkel uur</span>
+    <span><i class="sw own"></i>Karta blokuur</span><span><i class="sw own enkel"></i>Karta enkel uur</span>
+  </div>
+  <section class="cal" id="cal"><div class="status">Lessen laden…</div></section>
+</div>
+<div class="ov" id="ov" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  var START_H = 7, END_H = 22, HPX = 56, UNIT = 50;
+  var DAYS_SHORT = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
+  var MON = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  var MON_LONG = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  var $ = function (id) { return document.getElementById(id); };
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function parseYmd(s) { var p = s.split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2])); }
+  function ymd(d) { return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); }
+  function addDays(s, n) { var d = parseYmd(s); d.setUTCDate(d.getUTCDate() + n); return ymd(d); }
+  function addMonths(s, n) { var d = parseYmd(s); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() + n); return ymd(d); }
+  function mondayOf(s) { return addDays(s, -((parseYmd(s).getUTCDay() + 6) % 7)); }
+  function todayStr() { var n = new Date(); return n.getFullYear() + '-' + pad(n.getMonth() + 1) + '-' + pad(n.getDate()); }
+  function nowMin() { var n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
+  function isoWeek(s) {
+    var d = parseYmd(s);
+    d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7) + 3);
+    var ft = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+    return 1 + Math.round(((d - ft) / 86400000 - 3 + ((ft.getUTCDay() + 6) % 7)) / 7);
+  }
+  function dnum(s) { return parseYmd(s).getUTCDate(); }
+  function shortDate(s) { var d = parseYmd(s); return d.getUTCDate() + ' ' + MON[d.getUTCMonth()]; }
+  function toMin(t) { var p = (t || '').split(':'); return p.length === 2 ? Number(p[0]) * 60 + Number(p[1]) : NaN; }
+  function toTime(m) { m = ((m % 1440) + 1440) % 1440; return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+  function dur(l) { var d = toMin(l.end) - toMin(l.start); return d > 0 ? d : 0; }
+  function fmtH(min) { return Math.floor(min / 60) + 'u' + pad(min % 60); }
+  function fmtHM(min) { return fmtH(min) + ' (' + min + ' min)'; }
+  function fmtDur(min) { return fmtHM(min); }
+  function eur(n) {
+    var whole = Math.abs(n - Math.round(n)) < 0.005;
+    return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: 2 }).format(n);
+  }
+
+  function h(tag, props) {
+    var el = document.createElement(tag);
+    var kids = Array.prototype.slice.call(arguments, 2);
+    Object.keys(props || {}).forEach(function (k) {
+      var v = props[k];
+      if (k === 'class') el.className = v;
+      else if (k === 'value') el.value = v;
+      else if (k.indexOf('on') === 0) el.addEventListener(k.slice(2), v);
+      else if (v === true) el.setAttribute(k, '');
+      else if (v !== false && v != null) el.setAttribute(k, v);
+    });
+    (function add(list) {
+      list.forEach(function (kid) {
+        if (kid == null || kid === false) return;
+        if (Array.isArray(kid)) return add(kid);
+        el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+      });
+    })(kids);
+    return el;
+  }
+
+  var db = null, lessons = [], loaded = false, problem = '';
+  var cfg = { rateWork: 25, ownPrices: [40, 50], workName: 'Ruzgar', ownName: 'Karta' };
+  var narrow = window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
+  var view = narrow ? 'day' : 'week';
+  var cursor = todayStr();
+  var draft = null, formErr = '', confirmDel = false, saving = false, toastTimer = null, scrolled = false;
+
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function srcOf(l) { return l.source === 'own' ? 'own' : 'work'; }
+  function kindOf(l) { return dur(l) < 75 ? ' enkel' : ''; }
+  function defaultPrice(src) {
+    if (src === 'work') return cfg.rateWork;
+    var last = parseFloat(store('rp-own-price'));
+    return !isNaN(last) ? last : cfg.ownPrices[cfg.ownPrices.length - 1];
+  }
+  function unitOf(l) { return typeof l.unitPrice === 'number' ? l.unitPrice : (srcOf(l) === 'own' ? defaultPrice('own') : cfg.rateWork); }
+  /* Ruzgar betaalt per 60 minuten, Karta (eigen leerlingen) per 50 minuten */
+  function unitMin(src) { return src === 'own' ? 50 : 60; }
+  function priceOf(l) { return unitOf(l) * dur(l) / unitMin(srcOf(l)); }
+  function lessonsOn(d) {
+    return lessons.filter(function (l) { return l.date === d; }).sort(function (a, b) { return toMin(a.start) - toMin(b.start); });
+  }
+  function sums(list) {
+    var r = { min: 0, n: list.length, work: 0, own: 0 };
+    list.forEach(function (l) { r.min += dur(l); r[srcOf(l)] += priceOf(l); });
+    r.total = r.work + r.own;
+    return r;
+  }
+
+  function period() {
+    if (view === 'day') return [cursor, cursor];
+    if (view === 'year') { var yy = parseYmd(cursor).getUTCFullYear(); return [yy + '-01-01', yy + '-12-31']; }
+    if (view === 'week') { var m = mondayOf(cursor); return [m, addDays(m, 6)]; }
+    var f = addMonths(cursor, 0);
+    return [f, addDays(addMonths(f, 1), -1)];
+  }
+
+  function title() {
+    var p = period(), a = parseYmd(p[0]), b = parseYmd(p[1]);
+    var t, s;
+    if (view === 'year') { t = String(a.getUTCFullYear()); s = ''; }
+    else if (view === 'month') { t = MON_LONG[a.getUTCMonth()] + ' ' + a.getUTCFullYear(); s = ''; }
+    else if (view === 'week') {
+      t = a.getUTCMonth() === b.getUTCMonth() ? MON_LONG[a.getUTCMonth()] + ' ' + a.getUTCFullYear()
+        : MON[a.getUTCMonth()] + ' – ' + MON[b.getUTCMonth()] + ' ' + b.getUTCFullYear();
+      s = 'week ' + isoWeek(p[0]);
+    } else {
+      t = a.getUTCDate() + ' ' + MON_LONG[a.getUTCMonth()] + ' ' + a.getUTCFullYear();
+      s = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'][(a.getUTCDay() + 6) % 7];
+    }
+    var td = todayStr();
+    if (td >= p[0] && td <= p[1]) s = (s ? s + ' · ' : '') + (view === 'day' ? 'vandaag' : view === 'week' ? 'deze week' : view === 'year' ? 'dit jaar' : 'deze maand');
+    $('ttl').textContent = t; $('sub').textContent = s;
+    $('today').textContent = 'Vandaag · ' + DAYS_SHORT[(parseYmd(td).getUTCDay() + 6) % 7] + ' ' + shortDate(td) + ' ▾';
+  }
+
+  function renderSummary() {
+    var p = period();
+    var list = lessons.filter(function (l) { return l.date >= p[0] && l.date <= p[1]; });
+    var s = sums(list);
+    $('sum').replaceChildren(
+      h('div', { class: 'f' }, h('span', { class: 'lbl' }, 'Uren'), h('span', { class: 'val' }, fmtH(s.min)), h('span', { class: 'hint' }, '(' + s.min + ' min)')),
+      h('div', { class: 'f' }, h('span', { class: 'lbl' }, 'Lessen'), h('span', { class: 'val' }, String(s.n)),
+        h('span', { class: 'hint' }, list.filter(function (l) { return dur(l) === 2 * UNIT; }).length + ' blokuur · ' + list.filter(function (l) { return dur(l) === UNIT; }).length + ' enkel')),
+      h('div', { class: 'f' }, h('span', { class: 'lbl' }, 'Verdiend'), h('span', { class: 'val' }, eur(s.total))),
+      h('div', { class: 'split' },
+        h('span', null, h('i', { class: 'dot work' }), cfg.workName + ' ' + eur(s.work)),
+        h('span', null, h('i', { class: 'dot own' }), cfg.ownName + ' ' + eur(s.own))));
+  }
+
+  function layout(list) {
+    var res = [], cluster = [], cEnd = 0;
+    function flush() {
+      var ends = [];
+      cluster.forEach(function (e) {
+        var lane = 0;
+        while (ends[lane] !== undefined && ends[lane] > e.s) lane++;
+        ends[lane] = e.e; e.lane = lane;
+      });
+      cluster.forEach(function (e) { e.n = ends.length; res.push(e); });
+      cluster = [];
+    }
+    list.forEach(function (l) {
+      var s = toMin(l.start), e = Math.max(s + 20, toMin(l.end));
+      if (cluster.length && s >= cEnd) flush();
+      cluster.push({ l: l, s: s, e: e });
+      cEnd = cluster.length === 1 ? e : Math.max(cEnd, e);
+    });
+    if (cluster.length) flush();
+    return res;
+  }
+
+  function renderGrid() {
+    var days = [];
+    if (view === 'day') days = [cursor];
+    else { var m = mondayOf(cursor); for (var i = 0; i < 7; i++) days.push(addDays(m, i)); }
+    var n = days.length, today = todayStr(), hrs = END_H - START_H;
+    var tmpl = '48px repeat(' + n + ', minmax(0, 1fr))';
+    var minW = n > 1 ? 'min-width:720px;' : '';
+    var head = h('div', { class: 'calhead', style: 'grid-template-columns:' + tmpl + ';' + minW },
+      h('div', { class: 'corner' }),
+      days.map(function (d) {
+        var dow = (parseYmd(d).getUTCDay() + 6) % 7, mins = sums(lessonsOn(d)).min;
+        return h('button', { class: 'hd' + (d === today ? ' today' : ''), onclick: function () { if (view !== 'day') { cursor = d; view = 'day'; render(); } } },
+          h('span', { class: 'dn' }, DAYS_SHORT[dow]), h('span', { class: 'num' }, String(dnum(d))),
+          h('span', { class: 'mini' }, mins ? fmtHM(mins) : ''));
+      }));
+    var labels = [];
+    for (var hr = START_H + 1; hr < END_H; hr++) labels.push(h('span', { style: 'top:' + ((hr - START_H) * HPX) + 'px' }, pad(hr) + ':00'));
+    var body = h('div', { class: 'calbody', style: 'grid-template-columns:' + tmpl + ';' + minW + '--hpx:' + HPX + 'px;--hrs:' + hrs },
+      h('div', { class: 'gut' }, labels),
+      days.map(function (d) {
+        var col = h('div', { class: 'col', onclick: function (e) {
+          if (e.target.closest('.blk')) return;
+          var y = e.clientY - e.currentTarget.getBoundingClientRect().top;
+          var m = START_H * 60 + Math.floor(y / HPX * 6) * 10;
+          openLesson(null, d, Math.min(Math.max(m, START_H * 60), (END_H - 1) * 60));
+        } });
+        layout(lessonsOn(d)).forEach(function (e) {
+          var l = e.l, src = srcOf(l);
+          var top = (e.s - START_H * 60) * HPX / 60, ht = Math.max(18, (toMin(l.end) - e.s) * HPX / 60 - 1);
+          var info = l.start + '–' + l.end + ' · ' + eur(priceOf(l));
+          var tags = (l.tags || []).length ? ' · ' + l.tags.join(' ') : '';
+          col.append(h('button', { class: 'blk ' + src + kindOf(l), title: l.name + ' ' + info,
+            style: 'top:' + top + 'px;height:' + ht + 'px;left:calc(' + (e.lane / e.n * 100) + '% + 2px);width:calc(' + (100 / e.n) + '% - 4px)',
+            onclick: function () { openLesson(l); } },
+            h('b', null, l.name), ht >= 34 ? h('span', null, info + tags) : null));
+        });
+        if (d === today) {
+          var nm = nowMin();
+          if (nm >= START_H * 60 && nm <= END_H * 60) col.append(h('div', { class: 'nowline', style: 'top:' + ((nm - START_H * 60) * HPX / 60) + 'px' }));
+        }
+        return col;
+      }));
+    var sc = $('scroll');
+    var keep = sc ? sc.scrollTop : null;
+    sc = h('div', { class: 'scroll', id: 'scroll' }, head, body);
+    $('cal').replaceChildren(sc);
+    sc.scrollTop = keep != null && scrolled ? keep : 1.5 * HPX;
+    scrolled = true;
+  }
+
+  function renderMonth() {
+    var first = addMonths(cursor, 0), curMonth = parseYmd(first).getUTCMonth(), today = todayStr();
+    var start = mondayOf(first), cells = [];
+    DAYS_SHORT.forEach(function (d) { cells.push(h('div', { class: 'mh' }, d)); });
+    for (var i = 0; i < 42; i++) {
+      (function (d) {
+        var list = lessonsOn(d), s = sums(list), out = parseYmd(d).getUTCMonth() !== curMonth;
+        cells.push(h('button', { class: 'mc' + (out ? ' out' : '') + (d === today ? ' today' : ''), onclick: function () { cursor = d; view = 'day'; render(); } },
+          h('div', { class: 'top' }, h('span', { class: 'd' }, String(dnum(d))), list.length ? h('span', { class: 'hrs' }, fmtHM(s.min)) : null),
+          h('div', { class: 'pills' },
+            list.slice(0, 3).map(function (l) { return h('span', { class: 'pill ' + srcOf(l) + kindOf(l) }, l.start + ' ' + l.name); })),
+          list.length > 3 ? h('span', { class: 'more' }, '+' + (list.length - 3) + ' meer') : null));
+      })(addDays(start, i));
+    }
+    $('cal').replaceChildren(h('div', { class: 'month' }, cells), weekTable());
+    scrolled = false;
+  }
+
+  function weekTable() {
+    var first = addMonths(cursor, 0), last = addDays(addMonths(first, 1), -1), rows = [], m = mondayOf(first);
+    while (m <= last) {
+      (function (mm) {
+        var e = addDays(mm, 6), lo = mm < first ? first : mm, hi = e > last ? last : e;
+        var s = sums(lessons.filter(function (l) { return l.date >= lo && l.date <= hi; }));
+        rows.push(h('button', { type: 'button', class: 'wk', onclick: function () { cursor = mm; view = 'week'; render(); } },
+          h('span', { class: 'wkn' }, 'Week ' + isoWeek(mm)),
+          h('span', { class: 'wkd' }, shortDate(lo) + ' – ' + shortDate(hi)),
+          h('span', { class: 'wkl' }, s.n ? s.n + ' lessen' : '–'),
+          h('span', { class: 'wkmin' }, s.n ? fmtHM(s.min) : ''),
+          h('b', { class: 'wkm' }, s.n ? eur(s.total) : '')));
+      })(m);
+      m = addDays(m, 7);
+    }
+    return h('div', { class: 'weeks' }, h('div', { class: 'wkhead' }, 'Per week'), rows);
+  }
+
+  function renderYear() {
+    var y = parseYmd(cursor).getUTCFullYear(), today = todayStr(), cells = [];
+    for (var mo = 0; mo < 12; mo++) {
+      (function (mo) {
+        var first = y + '-' + pad(mo + 1) + '-01', last = addDays(addMonths(first, 1), -1);
+        var list = lessons.filter(function (l) { return l.date >= first && l.date <= last; }), s = sums(list), has = {};
+        list.forEach(function (l) { has[l.date] = true; });
+        var days = [], offset = (parseYmd(first).getUTCDay() + 6) % 7, n = dnum(last);
+        for (var i = 0; i < offset; i++) days.push(h('span', { class: 'yd' }));
+        for (var d = 1; d <= n; d++) {
+          var ds = y + '-' + pad(mo + 1) + '-' + pad(d);
+          days.push(h('span', { class: 'yd' + (has[ds] ? ' has' : '') + (ds === today ? ' today' : '') }, String(d)));
+        }
+        cells.push(h('button', { type: 'button', class: 'ymo' + (today.slice(0, 7) === first.slice(0, 7) ? ' cur' : ''),
+          'aria-label': MON_LONG[mo] + ' ' + y + (s.n ? ', ' + eur(s.total) + ' verdiend' : ', geen lessen'),
+          onclick: function () { cursor = first; view = 'month'; render(); } },
+          h('div', { class: 'yh' }, h('b', { class: 'ymn' }, MON_LONG[mo]), h('span', { class: 'yeur' + (s.n ? '' : ' zero') }, s.n ? eur(s.total) : '–')),
+          h('div', { class: 'ygrid' }, days),
+          h('div', { class: 'ysub' }, s.n ? s.n + ' lessen · ' + fmtHM(s.min) : 'Geen lessen')));
+      })(mo);
+    }
+    $('cal').replaceChildren(h('div', { class: 'year' }, cells));
+    scrolled = false;
+  }
+
+  function render() {
+    title();
+    Array.prototype.forEach.call($('views').children, function (b) { b.setAttribute('aria-pressed', b.dataset.v === view ? 'true' : 'false'); });
+    $('home').setAttribute('aria-pressed', view === 'year' ? 'true' : 'false');
+    $('legend').hidden = view === 'year';
+    if (problem) { $('sum').replaceChildren(); $('cal').replaceChildren(h('div', { class: 'status' }, problem)); return; }
+    if (!loaded) { $('sum').replaceChildren(); return; }
+    renderSummary();
+    if (view === 'year') renderYear(); else if (view === 'month') renderMonth(); else renderGrid();
+  }
+
+  /* ---------- les maken en wijzigen ---------- */
+  function openLesson(lesson, date, startMin) {
+    confirmDel = false; formErr = '';
+    if (lesson) {
+      draft = { id: lesson.id, date: lesson.date, start: lesson.start, end: lesson.end, name: lesson.name || '',
+        tags: (lesson.tags || []).join(', '), source: srcOf(lesson), unitPrice: unitOf(lesson), durTouched: true };
+    } else {
+      var src = store('rp-source') === 'own' ? 'own' : 'work';
+      var st = startMin;
+      if (st == null) { var day = lessonsOn(date), last = day[day.length - 1]; st = last ? toMin(last.end) : 9 * 60; }
+      draft = { id: null, date: date, start: toTime(st), end: toTime(st + (src === 'own' ? UNIT : 2 * UNIT)), name: '', tags: '',
+        source: src, unitPrice: defaultPrice(src), durTouched: false };
+    }
+    buildModal();
+    var nm = $('m-name'); if (nm) nm.focus();
+  }
+  function closeModal() { draft = null; $('ov').hidden = true; $('ov').replaceChildren(); }
+  function toast(t) {
+    var el = $('toast'); el.textContent = t; el.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.hidden = true; }, 2600);
+  }
+  function curDur() { var d = toMin(draft.end) - toMin(draft.start); return d > 0 ? d : 0; }
+  function refreshChips() {
+    var dc = $('m-dur'), pc = $('m-price');
+    if (!dc || !pc) return;
+    $('m-plbl').textContent = 'Prijs per ' + unitMin(draft.source) + ' minuten';
+    var d = curDur();
+    dc.replaceChildren.apply(dc, [50, 100].map(function (m) {
+      return h('button', { type: 'button', class: 'chip', 'aria-pressed': d === m ? 'true' : 'false', onclick: function () {
+        draft.durTouched = true; draft.end = toTime(toMin(draft.start) + m); $('m-end').value = draft.end; refreshChips(); } }, (m === 50 ? 'Enkel uur' : 'Blokuur') + ' · ' + m + ' min');
+    }));
+    var opts = draft.source === 'work' ? [cfg.rateWork] : cfg.ownPrices;
+    var inOpts = opts.indexOf(draft.unitPrice) !== -1;
+    pc.replaceChildren.apply(pc, opts.map(function (p) {
+      return h('button', { type: 'button', class: 'chip', 'aria-pressed': draft.unitPrice === p ? 'true' : 'false', onclick: function () {
+        draft.unitPrice = p; refreshChips(); } }, eur(p));
+    }).concat([h('input', { type: 'number', id: 'm-custom', step: '0.5', min: '0', placeholder: 'Anders', 'aria-label': 'Eigen prijs per ' + unitMin(draft.source) + ' minuten',
+      value: inOpts ? '' : String(draft.unitPrice), oninput: function (e) {
+        var v = parseFloat(e.target.value); if (!isNaN(v)) { draft.unitPrice = v; updateTotal(); } } })]));
+    updateTotal();
+  }
+  function updateTotal() {
+    var t = $('m-total'); if (!t) return;
+    t.textContent = eur(draft.unitPrice * curDur() / unitMin(draft.source));
+    var ds = $('m-dsum'); if (ds) ds.textContent = fmtDur(curDur());
+  }
+  function setSource(src) {
+    draft.source = src; draft.unitPrice = defaultPrice(src);
+    if (!draft.id && !draft.durTouched) { draft.end = toTime(toMin(draft.start) + (src === 'own' ? UNIT : 2 * UNIT)); $('m-end').value = draft.end; }
+    $('m-sw').setAttribute('aria-pressed', src === 'work' ? 'true' : 'false');
+    $('m-so').setAttribute('aria-pressed', src === 'own' ? 'true' : 'false');
+    refreshChips();
+  }
+  function buildModal() {
+    var isNew = !draft.id;
+    var form = h('form', { class: 'card', onsubmit: function (e) { e.preventDefault(); if (!saving) saveLesson(); } },
+      h('h2', null, isNew ? 'Nieuwe les' : 'Les wijzigen'),
+      h('div', { class: 'fld' }, h('label', { for: 'm-name' }, 'Leerling'),
+        h('input', { type: 'text', id: 'm-name', autocomplete: 'off', placeholder: 'Naam', value: draft.name, oninput: function (e) { draft.name = e.target.value; } })),
+      h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Rijschool'),
+        h('div', { class: 'seg' },
+          h('button', { type: 'button', id: 'm-sw', 'aria-pressed': draft.source === 'work' ? 'true' : 'false', onclick: function () { setSource('work'); } }, cfg.workName),
+          h('button', { type: 'button', id: 'm-so', 'aria-pressed': draft.source === 'own' ? 'true' : 'false', onclick: function () { setSource('own'); } }, cfg.ownName))),
+      h('div', { class: 'grid3' },
+        h('div', { class: 'fld' }, h('label', { for: 'm-date' }, 'Datum'),
+          h('input', { type: 'date', id: 'm-date', value: draft.date, oninput: function (e) { draft.date = e.target.value; } })),
+        h('div', { class: 'fld' }, h('label', { for: 'm-start' }, 'Van'),
+          h('input', { type: 'time', id: 'm-start', value: draft.start, oninput: function (e) {
+            var d = curDur(); draft.start = e.target.value;
+            if (!isNaN(toMin(draft.start)) && d) { draft.end = toTime(toMin(draft.start) + d); $('m-end').value = draft.end; }
+            refreshChips(); } })),
+        h('div', { class: 'fld' }, h('label', { for: 'm-end' }, 'Tot'),
+          h('input', { type: 'time', id: 'm-end', value: draft.end, oninput: function (e) { draft.durTouched = true; draft.end = e.target.value; refreshChips(); } }))),
+      h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Duur'), h('div', { class: 'chips', id: 'm-dur' })),
+      h('div', { class: 'fld' }, h('span', { class: 'l', id: 'm-plbl' }, 'Prijs per ' + unitMin(draft.source) + ' minuten'), h('div', { class: 'chips', id: 'm-price' })),
+      h('div', { class: 'total' }, h('span', null, 'Totaal voor ', h('span', { id: 'm-dsum' })), h('b', { id: 'm-total' })),
+      h('div', { class: 'fld' }, h('label', { for: 'm-tags' }, 'Labels (optioneel)'),
+        h('input', { type: 'text', id: 'm-tags', autocomplete: 'off', placeholder: 'A, 1, PROEFLES', value: draft.tags, oninput: function (e) { draft.tags = e.target.value; } })),
+      h('div', { class: 'err', id: 'm-err', role: 'alert' }, formErr),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn primary', type: 'submit' }, isNew ? 'Toevoegen' : 'Opslaan'),
+        h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Annuleren'),
+        h('span', { class: 'sp' }),
+        isNew ? null : h('button', { class: 'btn', type: 'button', onclick: copyNextWeek }, 'Zelfde les volgende week'),
+        isNew ? null : h('button', { class: 'btn danger', type: 'button', id: 'm-del', onclick: delLesson }, 'Verwijderen')));
+    $('ov').replaceChildren(form); $('ov').hidden = false;
+    refreshChips();
+  }
+  function bodyFromDraft() {
+    var name = draft.name.trim(), s = toMin(draft.start), e = toMin(draft.end);
+    if (!name) return 'Vul de naam van de leerling in.';
+    if (isNaN(s) || isNaN(e) || e <= s) return 'De eindtijd moet na de starttijd liggen.';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) return 'Kies een datum.';
+    if (typeof draft.unitPrice !== 'number' || isNaN(draft.unitPrice) || draft.unitPrice < 0) return 'Vul een prijs in.';
+    return { date: draft.date, start: draft.start, end: draft.end, name: name, source: draft.source, unitPrice: draft.unitPrice,
+      tags: draft.tags.split(',').map(function (t) { return t.trim(); }).filter(Boolean) };
+  }
+  function newId() { return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  async function saveLesson() {
+    var b = bodyFromDraft();
+    if (typeof b === 'string') { $('m-err').textContent = b; formErr = b; return; }
+    saving = true;
+    try {
+      await db.collection('lessons').doc(draft.id || newId()).set(b);
+      store('rp-source', b.source); if (b.source === 'own') store('rp-own-price', String(b.unitPrice));
+      cursor = b.date; closeModal(); render();
+    } catch (err) { formErr = 'Opslaan lukt niet. Probeer het zo nog eens.'; $('m-err').textContent = formErr; }
+    finally { saving = false; }
+  }
+  async function copyNextWeek() {
+    var b = bodyFromDraft();
+    if (typeof b === 'string') { $('m-err').textContent = b; return; }
+    b.date = addDays(b.date, 7);
+    try { await db.collection('lessons').doc(newId()).set(b); toast('Gekopieerd naar ' + shortDate(b.date)); }
+    catch (err) { $('m-err').textContent = 'Kopiëren lukt niet. Probeer het zo nog eens.'; }
+  }
+  async function delLesson() {
+    if (!confirmDel) { confirmDel = true; $('m-del').textContent = 'Zeker weten? Verwijder'; return; }
+    try { await db.collection('lessons').doc(draft.id).delete(); closeModal(); }
+    catch (err) { $('m-err').textContent = 'Verwijderen lukt niet. Probeer het zo nog eens.'; }
+  }
+
+  /* ---------- back-up ---------- */
+  function openBackup() {
+    draft = { settings: true };
+    $('ov').replaceChildren(h('div', { class: 'card' },
+      h('h2', null, 'Back-up'),
+      h('p', { class: 'hint' }, 'Je lessen staan op dit toestel. Maak af en toe een back-up, dan raak je niets kwijt en kun je ze ook op een ander apparaat laden.'),
+      h('p', { class: 'hint' }, 'Versie ' + BUILD),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn primary', type: 'button', onclick: downloadBackup }, 'Back-up maken'),
+        h('button', { class: 'btn', type: 'button', onclick: function () { $('s-file').click(); } }, 'Back-up laden'),
+        h('input', { type: 'file', id: 's-file', accept: '.json,application/json', hidden: true, onchange: function (e) { loadBackup(e.target.files[0]); } })),
+      h('span', { class: 'err', id: 's-err' }),
+      h('div', { class: 'acts' }, h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten'))));
+    $('ov').hidden = false;
+  }
+
+  /* ---------- knoppen ---------- */
+  function step(dir) {
+    if (view === 'day') cursor = addDays(cursor, dir);
+    else if (view === 'week') cursor = addDays(cursor, 7 * dir);
+    else cursor = addMonths(cursor, view === 'year' ? 12 * dir : dir);
+    render();
+  }
+  $('prev').addEventListener('click', function () { step(-1); });
+  $('next').addEventListener('click', function () { step(1); });
+  $('today').addEventListener('click', function () { togglePicker($('today')); });
+  $('views').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { view = b.dataset.v; render(); } });
+  $('home').addEventListener('click', function () { view = 'year'; closePicker(); render(); });
+  $('add').addEventListener('click', function () {
+    var d = view === 'month' || view === 'year' ? todayStr() : (view === 'week' ? (function () { var t = todayStr(), m = mondayOf(cursor); return t >= m && t <= addDays(m, 6) ? t : cursor; })() : cursor);
+    openLesson(null, d);
+  });
+  $('cfg').addEventListener('click', openBackup);
+  $('ov').addEventListener('mousedown', function (e) { if (e.target === $('ov')) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('ov').hidden) closeModal(); });
+
+  /* ---------- opslag in deze browser, met back-up naar een bestand ---------- */
+  var STORE_KEY = 'rijlesplanner-v1';
+  var BUILD = '1 · 27 okt 2026';
+  var SEED = [];
+  function localDb() {
+    var mem = null, subs = { lessons: [], settings: [] };
+    try { var raw = localStorage.getItem(STORE_KEY); if (raw) mem = JSON.parse(raw); } catch (e) { mem = null; }
+    if (!mem || typeof mem !== 'object' || !mem.lessons) {
+      mem = { lessons: {}, settings: { rate: 25, ownPrices: [40, 50] } };
+      SEED.forEach(function (r, i) {
+        mem.lessons['s' + i] = { date: r[0], start: r[1], end: r[2], name: r[3], tags: r[4] || [], source: r[5] || 'work', unitPrice: r[6] || 25 };
+      });
+    }
+    var warned = false;
+    function persist() {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(mem)); }
+      catch (e) { if (!warned) { warned = true; toast('Opslaan in deze browser lukt niet. Maak een back-up met de knop Back-up.'); } }
+    }
+    function snapL() { return { docs: Object.keys(mem.lessons).map(function (id) { return { id: id, data: function () { return mem.lessons[id]; } }; }) }; }
+    function snapS() { return { exists: !!mem.settings, data: function () { return mem.settings; } }; }
+    function notify() { subs.lessons.forEach(function (f) { f(snapL()); }); subs.settings.forEach(function (f) { f(snapS()); }); }
+    persist();
+    var api = {
+      collection: function () {
+        return {
+          doc: function (id) {
+            return {
+              set: function (b) { mem.lessons[id] = b; persist(); notify(); return Promise.resolve(); },
+              delete: function () { delete mem.lessons[id]; persist(); notify(); return Promise.resolve(); }
+            };
+          },
+          onSnapshot: function (next) { subs.lessons.push(next); next(snapL()); }
+        };
+      },
+      doc: function () {
+        return {
+          set: function (b) { mem.settings = b; persist(); notify(); return Promise.resolve(); },
+          onSnapshot: function (next) { subs.settings.push(next); next(snapS()); }
+        };
+      },
+      exportJson: function () { return JSON.stringify({ app: 'rijlesplanner', lessons: mem.lessons, settings: mem.settings }, null, 1); },
+      importJson: function (text) {
+        var d = JSON.parse(text);
+        if (!d || typeof d.lessons !== 'object' || d.lessons === null) throw new Error('bad');
+        mem.lessons = d.lessons; if (d.settings) mem.settings = d.settings;
+        persist(); notify();
+      }
+    };
+    return api;
+  }
+  function downloadBackup() {
+    var blob = new Blob([db.exportJson()], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'rijlesplanner-backup-' + todayStr() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+  function loadBackup(file) {
+    if (!file) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try { db.importJson(String(r.result)); closeModal(); toast('Back-up geladen'); }
+      catch (e) { var el = document.getElementById('s-err'); if (el) el.textContent = 'Dit bestand is geen geldige back-up.'; }
+    };
+    r.readAsText(file);
+  }
+
+  /* ---------- datumkiezer en actuele datum ---------- */
+  var pickM = null;
+  function closePicker() { $('pick').hidden = true; $('ttlbtn').setAttribute('aria-expanded', 'false'); $('today').setAttribute('aria-expanded', 'false'); }
+  function renderPicker() {
+    var first = pickM, a = parseYmd(first), curMonth = a.getUTCMonth(), td = todayStr(), start = mondayOf(first), cells = [];
+    DAYS_SHORT.forEach(function (d) { cells.push(h('span', { class: 'pw' }, d)); });
+    for (var i = 0; i < 42; i++) (function (d) {
+      var out = parseYmd(d).getUTCMonth() !== curMonth;
+      cells.push(h('button', { type: 'button', class: 'pd' + (out ? ' out' : '') + (d === td ? ' today' : '') + (d === cursor ? ' sel' : ''),
+        'aria-label': dnum(d) + ' ' + MON_LONG[parseYmd(d).getUTCMonth()] + ' ' + parseYmd(d).getUTCFullYear(),
+        onclick: function () { cursor = d; if (view === 'year') view = 'day'; closePicker(); render(); } },
+        String(dnum(d)), lessonsOn(d).length ? h('i', { class: 'pdot' }) : null));
+    })(addDays(start, i));
+    $('pick').replaceChildren(
+      h('div', { class: 'ph' },
+        h('button', { type: 'button', class: 'btn ghost', 'aria-label': 'Vorige maand', onclick: function () { pickM = addMonths(pickM, -1); renderPicker(); } }, '‹'),
+        h('b', null, MON_LONG[a.getUTCMonth()] + ' ' + a.getUTCFullYear()),
+        h('button', { type: 'button', class: 'btn ghost', 'aria-label': 'Volgende maand', onclick: function () { pickM = addMonths(pickM, 1); renderPicker(); } }, '›')),
+      h('div', { class: 'pg' }, cells),
+      h('div', { class: 'pf' }, h('button', { type: 'button', class: 'btn', onclick: function () { cursor = todayStr(); if (view === 'year') view = 'day'; closePicker(); render(); } }, 'Vandaag')));
+  }
+  var pickFrom = null;
+  function togglePicker(from) {
+    if (!$('pick').hidden && pickFrom === from) return closePicker();
+    closePicker();
+    pickFrom = from; pickM = addMonths(cursor, 0); renderPicker();
+    var pk = $('pick'); pk.hidden = false;
+    var box = $('ttlbtn').closest('.title').getBoundingClientRect(), r = from.getBoundingClientRect();
+    var maxLeft = document.documentElement.clientWidth - 16 - pk.offsetWidth - box.left;
+    pk.style.left = Math.max(16 - box.left, Math.min(r.left - box.left, maxLeft)) + 'px';
+    pk.style.top = (r.bottom - box.top + 8) + 'px';
+    from.setAttribute('aria-expanded', 'true');
+  }
+  $('ttlbtn').addEventListener('click', function () { togglePicker($('ttlbtn')); });
+  document.addEventListener('click', function (e) { if (!$('pick').hidden && !e.target.closest('.title, #today')) closePicker(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePicker(); });
+  var todayKey = todayStr();
+  function tick() {
+    var n = todayStr();
+    if (n !== todayKey) { var old = todayKey; todayKey = n; if (cursor === old) cursor = n; render(); }
+  }
+  setInterval(tick, 30000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { tick(); if (loaded && $('ov').hidden) render(); } });
+  window.addEventListener('focus', tick);
+
+  render();
+  (async function init() {
+    db = localDb();
+    db.collection('lessons').onSnapshot(function (snap) {
+      lessons = snap.docs.map(function (d) { var x = d.data() || {}; x.id = d.id; return x; });
+      loaded = true; render();
+    }, function () { problem = 'Je lessen konden niet geladen worden. Ververs de pagina.'; render(); });
+  })();
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>
