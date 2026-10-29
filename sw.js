@@ -1,5 +1,5 @@
 /* Karta Drive: laatste versie bij elke start, en werkt ook zonder internet */
-var CACHE = 'karta-drive-v6';
+var CACHE = 'karta-drive-v7';
 var CORE = ['./', 'index.html', 'firebase-config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));
