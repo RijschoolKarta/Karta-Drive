@@ -324,12 +324,112 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   .mc .pill.own.enkel { background: transparent; box-shadow: inset 0 0 0 2px var(--own-c); }
   .mc .pill.exam { background: var(--exam-c); box-shadow: none; }
 }
+
+/* ---------- menu en pagina's ---------- */
+.title { align-items: center; }
+.menubtn { flex: none; width: 40px; height: 40px; display: inline-grid; place-items: center; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 10px; color: var(--ink); padding: 0; }
+.menubtn svg { width: 22px; height: 22px; }
+.menubtn:hover { border-color: var(--accent); }
+#page .title h1 { font: 700 32px/1 var(--font-display); margin: 0; }
+.drawer-ov { position: fixed; inset: 0; z-index: 45; background: rgba(10, 16, 22, .45); opacity: 0; transition: opacity .18s; }
+.drawer-ov.open { opacity: 1; }
+.drawer { position: absolute; top: 0; bottom: 0; left: 0; width: min(300px, 84vw); background: var(--surface); border-right: 1px solid var(--line);
+  padding: max(18px, env(safe-area-inset-top, 0px)) 12px max(18px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+  display: flex; flex-direction: column; gap: 4px; transform: translateX(-100%); transition: transform .2s ease; overflow-y: auto; }
+.drawer-ov.open .drawer { transform: none; }
+.dhead { display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px; }
+.dhead img { border-radius: 10px; }
+.dhead b { font: 700 22px/1 var(--font-display); }
+.ditem { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; background: transparent; border-radius: 10px; padding: 12px 10px; font-size: 17px; text-align: left; }
+.ico { display: inline-grid; place-items: center; flex: none; }
+.ico svg { width: 22px; height: 22px; }
+.ditem .ico { color: var(--muted); }
+.ditem:hover { background: var(--accent-soft); }
+.ditem[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.ditem[aria-current="page"] .ico { color: var(--accent); }
+.dbadge { margin-left: auto; font-size: 12px; font-weight: 600; background: var(--own-c); color: #FFFFFF; border-radius: 99px; padding: 3px 8px; }
+.dfoot { margin-top: auto; padding: 12px 8px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.pbody { display: flex; flex-direction: column; gap: 14px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+.card.flat { max-width: 640px; max-height: none; overflow: visible; }
+.navlbl { min-width: 6.5rem; font-weight: 600; text-transform: capitalize; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.stat .lbl { font: 600 11px/1.2 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.stat .val { font: 700 28px/1 var(--font-display); }
+.stat.warn .val { color: var(--own-c); }
+.stat.good .val { color: #1E8A4C; }
+.search { width: 100%; padding: 11px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); font-size: 16px; }
+.slist { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.strow, .rcrow { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; border-top: 1px solid var(--line); background: transparent; padding: 12px 14px; text-align: left; }
+.strow:first-child, .rcrow:first-child { border-top: 0; }
+.strow:hover, .rcrow:hover { background: var(--accent-soft); }
+.av { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 15px; color: #FFFFFF; background: var(--work-c); }
+.av.own { background: var(--own-c); }
+.av.mixed { background: linear-gradient(135deg, var(--work-c) 50%, var(--own-c) 50%); }
+.av.big { width: 48px; height: 48px; font-size: 18px; }
+.stmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.stmain b { font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stmain span { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stside { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 12.5px; text-align: right; }
+.badge { border-radius: 99px; padding: 3px 8px; font-weight: 600; font-size: 12px; white-space: nowrap; }
+.badge.open { background: var(--ownE-bg); color: var(--ownE-ink); }
+.badge.exam { background: var(--exam-c); color: #FFFFFF; }
+.badge.next { color: var(--muted); padding: 0; font-weight: 500; }
+.sthead { display: flex; align-items: center; gap: 12px; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.fact { background: var(--bg); border-radius: 10px; padding: 9px 11px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fact small { color: var(--muted); font-size: 12px; }
+.fact b { font-size: 15px; }
+.fact.warn b { color: var(--own-c); }
+.llist { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.lrow { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-top: 1px solid var(--line); }
+.lrow:first-child { border-top: 0; }
+.lrow.future { background: var(--bg); }
+.lmain { flex: 1; min-width: 0; border: 0; background: transparent; text-align: left; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.lmain b { font-size: 14px; font-weight: 600; }
+.lmain span { font-size: 12.5px; color: var(--muted); }
+.amt { font-weight: 600; white-space: nowrap; font-size: 14px; }
+.paid { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); white-space: nowrap; min-width: 5.6rem; justify-content: flex-end; }
+.paid input { width: 20px; height: 20px; margin: 0; accent-color: var(--own-c); }
+.months .mhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px 8px; font: 600 11px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.mleg { display: inline-flex; align-items: center; gap: 4px 6px; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 12px; }
+.mleg .dot { margin: 0 0 0 6px; }
+.mrow { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr) auto; grid-template-rows: auto auto; gap: 4px 12px; align-items: center; width: 100%; border: 0; border-top: 1px solid var(--line); background: transparent; padding: 10px 14px; text-align: left; }
+.mrow:hover { background: var(--accent-soft); }
+.mname { text-transform: capitalize; }
+.mrow.cur .mname { color: var(--accent); }
+.mbar { display: flex; height: 10px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.mbar i { display: block; height: 100%; }
+.mbar .w { background: var(--work-c); }
+.mbar .o { background: var(--own-c); }
+.mamt { text-align: right; white-space: nowrap; }
+.mamt.zero { color: var(--muted); font-weight: 400; }
+.msub { grid-column: 2 / 4; font-size: 12px; color: var(--muted); }
+.rcact { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn.cam { display: inline-flex; align-items: center; gap: 8px; }
+.rcthumb { flex: none; width: 44px; height: 56px; border-radius: 6px; object-fit: cover; background: var(--bg); border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); }
+.rcamt { font-size: 15px; }
+.cats { display: flex; flex-direction: column; gap: 6px; }
+.catline { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.rcphoto { width: 100%; max-height: 220px; object-fit: contain; background: var(--bg); border-radius: 10px; cursor: zoom-in; }
+.rcphoto.big { max-height: none; cursor: zoom-out; }
+.rcstatus { font-size: 13.5px; padding: 9px 11px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); }
+.rcstatus.ok { background: var(--bg); color: var(--ink); }
+.rcstatus.warn { background: var(--ownE-bg); color: var(--ownE-ink); }
+.card input:disabled { opacity: .55; }
+@media (max-width: 640px) {
+  #page .title h1 { font-size: 26px; }
+  .stat .val { font-size: 24px; }
+  .mrow { grid-template-columns: 5.2rem minmax(0, 1fr) auto; }
+  .facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
 </style>
 </head>
 <body>
 <div class="wrap" id="app">
   <header class="bar">
-    <div class="title"><h1><button class="ttlbtn" id="ttlbtn" aria-haspopup="dialog" aria-expanded="false"><span id="ttl"></span> <span class="car" aria-hidden="true">▾</span></button></h1><small id="sub"></small><div class="pick" id="pick" role="dialog" aria-label="Datum kiezen" hidden></div></div>
+    <div class="title"><button class="menubtn" type="button" data-menu aria-label="Menu openen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><h1><button class="ttlbtn" id="ttlbtn" aria-haspopup="dialog" aria-expanded="false"><span id="ttl"></span> <span class="car" aria-hidden="true">▾</span></button></h1><small id="sub"></small><div class="pick" id="pick" role="dialog" aria-label="Datum kiezen" hidden></div></div>
     <div class="tools">
       <button class="btn home" id="home" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
       <div class="nav"><button id="prev" aria-label="Vorige">‹</button><button id="today" aria-haspopup="dialog" aria-expanded="false">Vandaag</button><button id="next" aria-label="Volgende">›</button></div>
@@ -339,7 +439,6 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         <button data-v="month" aria-pressed="false">Maand</button>
       </div>
       <button class="btn primary" id="add">+ Les</button>
-      <button class="btn ghost acct" id="cfg" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Account</button>
     </div>
   </header>
   <section class="sum" id="sum" aria-label="Samenvatting"></section>
@@ -347,6 +446,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   </div>
   <section class="cal" id="cal"><div class="status">Lessen laden…</div></section>
 </div>
+<div class="wrap" id="page" hidden>
+  <header class="bar">
+    <div class="title"><button class="menubtn" type="button" data-menu aria-label="Menu openen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><h1 id="ptitle"></h1></div>
+    <div class="tools" id="ptools"></div>
+  </header>
+  <div class="pbody" id="pbody"></div>
+</div>
+<div class="drawer-ov" id="drawer" hidden></div>
 <div class="gate" id="gate" hidden></div>
 <div class="ov" id="ov" hidden></div>
 <div class="toast" id="toast" hidden></div>
@@ -644,6 +751,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       h('span', null, h('i', { class: 'sw own' }), cfg.ownName + ' blokuur'), h('span', null, h('i', { class: 'sw own enkel' }), cfg.ownName + ' enkel uur'), h('span', null, h('i', { class: 'sw exam' }), 'Examen'));
   }
   function render() {
+    if (!$('gate').hidden) { $('app').hidden = true; $('page').hidden = true; return; }
+    $('app').hidden = page !== 'agenda'; $('page').hidden = page === 'agenda';
+    if (page !== 'agenda') { renderPage(); return; }
     title();
     Array.prototype.forEach.call($('views').children, function (b) { b.setAttribute('aria-pressed', b.dataset.v === view ? 'true' : 'false'); });
     $('home').setAttribute('aria-pressed', view === 'year' ? 'true' : 'false');
@@ -656,17 +766,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   }
 
   /* ---------- les maken en wijzigen ---------- */
-  function openLesson(lesson, date, startMin, exam) {
+  function openLesson(lesson, date, startMin, exam, pre) {
     confirmDel = false; formErr = '';
     if (lesson) {
       draft = { id: lesson.id, date: lesson.date, start: lesson.start, end: lesson.end, name: lesson.name || '',
-        tags: splitGear(lesson.tags).rest.join(', '), gear: splitGear(lesson.tags).gear, source: srcOf(lesson), unitPrice: unitOf(lesson), unitMin: lessonUnit(lesson), exam: !!lesson.exam, durTouched: true };
+        tags: splitGear(lesson.tags).rest.join(', '), gear: splitGear(lesson.tags).gear, source: srcOf(lesson), unitPrice: unitOf(lesson), unitMin: lessonUnit(lesson), exam: !!lesson.exam, paid: !!lesson.paid, durTouched: true };
     } else {
-      var src = store('rp-source') === 'own' ? 'own' : 'work';
+      var src = pre && pre.source ? pre.source : store('rp-source') === 'own' ? 'own' : 'work';
       var st = startMin;
       if (st == null) { var day = lessonsOn(date), last = day[day.length - 1]; st = last ? toMin(last.end) : 9 * 60; }
-      draft = { id: null, date: date, start: toTime(st), end: toTime(st + (src === 'own' ? UNIT : 2 * UNIT)), name: '', tags: '', gear: '',
-        source: src, unitPrice: defaultPrice(src), unitMin: unitMin(src), exam: !!exam, durTouched: false };
+      draft = { id: null, date: date, start: toTime(st), end: toTime(st + (src === 'own' ? UNIT : 2 * UNIT)), name: pre && pre.name || '', tags: '', gear: pre && pre.gear || '',
+        source: src, unitPrice: defaultPrice(src), unitMin: unitMin(src), exam: !!exam, paid: false, durTouched: false };
     }
     buildModal();
     var nm = $('m-name'); if (nm) nm.focus();
@@ -794,7 +904,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) return 'Kies een datum.';
     if (typeof draft.unitPrice !== 'number' || isNaN(draft.unitPrice) || draft.unitPrice < 0) return 'Vul een prijs in.';
     return { date: draft.date, start: draft.start, end: draft.end, name: name, source: draft.source, unitPrice: draft.unitPrice, unitMin: draft.unitMin,
-      tags: (draft.gear ? [draft.gear] : []).concat(freeTags()), exam: !!draft.exam };
+      tags: (draft.gear ? [draft.gear] : []).concat(freeTags()), exam: !!draft.exam, paid: !!draft.paid };
   }
   function newId() { return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   async function saveLesson() {
@@ -811,7 +921,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   async function copyNextWeek() {
     var b = bodyFromDraft();
     if (typeof b === 'string') { $('m-err').textContent = b; return; }
-    b.date = addDays(b.date, 7); b.exam = false;
+    b.date = addDays(b.date, 7); b.exam = false; b.paid = false;
     try { await db.put(newId(), b); toast('Gekopieerd naar ' + shortDate(b.date)); }
     catch (err) { $('m-err').textContent = 'Kopiëren lukt niet. Probeer het zo nog eens.'; }
   }
@@ -837,13 +947,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var d = view === 'month' || view === 'year' ? todayStr() : (view === 'week' ? (function () { var t = todayStr(), m = mondayOf(cursor); return t >= m && t <= addDays(m, 6) ? t : cursor; })() : cursor);
     openLesson(null, d);
   });
-  $('cfg').addEventListener('click', function () { openAccount(false); });
   $('ov').addEventListener('mousedown', function (e) { if (e.target === $('ov')) closeModal(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('ov').hidden) closeModal(); });
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '9 · 30 okt 2026';
+  var BUILD = '10 · 30 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
@@ -858,19 +967,21 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function localCount() { var m = readLocal(); return m ? Object.keys(m.lessons).length : 0; }
   function cleanLesson(b) {
     var o = {};
-    ['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags', 'exam'].forEach(function (k) { if (b && b[k] !== undefined) o[k] = b[k]; });
+    ['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags', 'exam', 'paid'].forEach(function (k) { if (b && b[k] !== undefined) o[k] = b[k]; });
     return o;
   }
 
   function localDb() {
     var mem = readLocal() || { lessons: {}, settings: null };
-    var subs = [], ssubs = [], warned = false;
+    if (!mem.receipts) mem.receipts = {};
+    var subs = [], ssubs = [], rsubs = [], warned = false;
     function persist() {
       try { localStorage.setItem(STORE_KEY, JSON.stringify(mem)); }
       catch (e) { if (!warned) { warned = true; toast('Opslaan in deze browser lukt niet. Maak een back-up via Account.'); } }
     }
     function list() { return Object.keys(mem.lessons).map(function (id) { var x = Object.assign({}, mem.lessons[id]); x.id = id; return x; }); }
-    function notify() { subs.forEach(function (f) { f(list(), false); }); ssubs.forEach(function (f) { f(mem.settings || null, false); }); }
+    function rlist() { return Object.keys(mem.receipts).map(function (id) { var x = Object.assign({}, mem.receipts[id]); x.id = id; return x; }); }
+    function notify() { subs.forEach(function (f) { f(list(), false); }); ssubs.forEach(function (f) { f(mem.settings || null, false); }); rsubs.forEach(function (f) { f(rlist()); }); }
     return {
       kind: 'local',
       watchLessons: function (f) { subs.push(f); f(list(), false); },
@@ -879,7 +990,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       remove: function (id) { delete mem.lessons[id]; persist(); notify(); return Promise.resolve(); },
       putSettings: function (st) { mem.settings = st; persist(); notify(); return Promise.resolve(); },
       putMany: function (map) { Object.keys(map).forEach(function (id) { mem.lessons[id] = cleanLesson(map[id]); }); persist(); notify(); return Promise.resolve(); },
-      stop: function () { subs = []; ssubs = []; }
+      watchReceipts: function (f) { rsubs.push(f); f(rlist()); },
+      putReceipt: function (id, meta, photo) {
+        mem.receipts[id] = cleanReceipt(meta);
+        if (photo) { try { localStorage.setItem('rijlesplanner-img-' + id, photo); } catch (e) { mem.receipts[id].hasPhoto = false; } }
+        persist(); notify(); return Promise.resolve();
+      },
+      removeReceipt: function (id) { delete mem.receipts[id]; try { localStorage.removeItem('rijlesplanner-img-' + id); } catch (e) {} persist(); notify(); return Promise.resolve(); },
+      getImage: function (id) { try { return Promise.resolve(localStorage.getItem('rijlesplanner-img-' + id)); } catch (e) { return Promise.resolve(null); } },
+      stop: function () { subs = []; ssubs = []; rsubs = []; }
     };
   }
 
@@ -913,13 +1032,33 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         }
         return Promise.all(jobs);
       },
+      /* Bonnen: gegevens in users/<id>/receipts, de foto apart in users/<id>/receiptImages (alleen geladen als je de bon opent) */
+      watchReceipts: function (f) {
+        stops.push(me.collection('receipts').onSnapshot(function (snap) {
+          f(snap.docs.map(function (d) { var x = d.data() || {}; x.id = d.id; return x; }));
+        }, function () {}));
+      },
+      putReceipt: function (id, meta, photo) {
+        var b = fs.batch();
+        b.set(me.collection('receipts').doc(id), cleanReceipt(meta));
+        if (photo) b.set(me.collection('receiptImages').doc(id), { data: photo });
+        b.commit().catch(fail('Opslaan van de bon'));
+        return Promise.resolve();
+      },
+      removeReceipt: function (id) {
+        var b = fs.batch();
+        b.delete(me.collection('receipts').doc(id)); b.delete(me.collection('receiptImages').doc(id));
+        b.commit().catch(fail('Verwijderen'));
+        return Promise.resolve();
+      },
+      getImage: function (id) { return me.collection('receiptImages').doc(id).get().then(function (d) { return d.exists ? d.data().data : null; }); },
       stop: function () { stops.forEach(function (u) { try { u(); } catch (e) {} }); stops = []; }
     };
   }
   function within(p, ms) { return Promise.race([p, new Promise(function (r) { setTimeout(r, ms); })]); }
 
   function start(d) {
-    db = d; loaded = false; lessons = []; problem = ''; settingsKnown = false; settingsExist = false; asked = false;
+    db = d; loaded = false; lessons = []; receipts = []; problem = ''; settingsKnown = false; settingsExist = false; asked = false;
     cfg = normSettings(null, d.kind === 'local' ? DEFAULTS_LOCAL : DEFAULTS_NEW);
     render();
     d.watchSettings(function (st, fromCache) {
@@ -932,6 +1071,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       if (db !== d) return;
       lessons = list; loaded = true; render(); maybeAsk();
     }, function () { problem = 'Je lessen konden niet geladen worden. Ververs de pagina.'; render(); });
+    d.watchReceipts(function (list) { if (db !== d) return; receipts = list; if (page !== 'agenda') render(); });
   }
 
   /* Na het inloggen: lessen van vóór de accounts overzetten, of een nieuw account laten kiezen welke rijscholen en prijzen */
@@ -972,6 +1112,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function fmtNum(n) { return String(n).replace('.', ','); }
   function openAccount(welcome) {
     draft = { settings: true };
+    $('ov').replaceChildren(accountCard(welcome, false)); $('ov').hidden = false;
+  }
+  function accountCard(welcome, inPage) {
     var f = { workUnit: cfg.workUnit, ownUnit: cfg.ownUnit };
     function unitSeg(key, label) {
       var bs = [50, 60].map(function (m) {
@@ -1008,9 +1151,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         unitSeg(src === 'work' ? 'workUnit' : 'ownUnit', 'Prijs geldt per'));
     }
     var n = localCount(), canMove = user && n && !store('rp-moved-' + user.uid);
-    var card = h('form', { class: 'card', onsubmit: function (e) { e.preventDefault(); saveSettings(f, welcome); } },
-      h('h2', null, welcome ? 'Welkom bij Karta DrivePlan' : 'Account'),
-      welcome ? h('p', null, 'Vul de namen van je twee rijscholen (of werkgever en eigen leerlingen) en je prijzen in. Je kunt dit later altijd aanpassen via Account.') : null,
+    return h('form', { class: 'card' + (inPage ? ' flat' : ''), onsubmit: function (e) { e.preventDefault(); saveSettings(f, welcome); } },
+      inPage ? null : h('h2', null, welcome ? 'Welkom bij Karta DrivePlan' : 'Account'),
+      welcome ? h('p', null, 'Vul de namen van je twee rijscholen (of werkgever en eigen leerlingen) en je prijzen in. Je kunt dit later altijd aanpassen via het menu, onder Instellingen.') : null,
       user ? h('div', { class: 'who' }, h('span', { class: 'hint' }, 'Ingelogd als'), h('b', null, user.email || '')) :
         h('p', { class: 'hint' }, 'Je lessen staan op dit toestel.'),
       h('h3', null, 'Rijscholen en prijzen'),
@@ -1020,13 +1163,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       h('div', { class: 'err', id: 's-err', role: 'alert' }),
       h('div', { class: 'acts' },
         h('button', { class: 'btn primary', type: 'submit' }, welcome ? 'Klaar' : 'Opslaan'),
-        welcome ? null : h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten')),
-      welcome ? null : exportBlock(),
+        welcome || inPage ? null : h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten')),
       canMove ? h('button', { class: 'btn', type: 'button', onclick: function () { openMove(n); } }, 'Lessen van dit toestel overzetten (' + n + ')') : null,
       user && !welcome ? h('div', { class: 'acts' }, h('span', { class: 'sp' }),
         h('button', { class: 'btn danger', type: 'button', onclick: logOut }, 'Uitloggen')) : null,
       h('p', { class: 'hint' }, 'Versie ' + BUILD));
-    $('ov').replaceChildren(card); $('ov').hidden = false;
   }
   function saveSettings(f, welcome) {
     var wn = $('s-wn').value.trim(), on = $('s-on').value.trim(), err = $('s-err');
@@ -1043,7 +1184,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     closeModal(); render(); toast(welcome ? 'Klaar! Tik op + Les om je eerste les te plannen.' : 'Opgeslagen');
   }
   function logOut() {
-    closeModal();
+    closeModal(); closeDrawer();
     if (db) { db.stop(); db = null; }
     firebase.auth().signOut();
   }
@@ -1181,9 +1322,27 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     }), [{ v: fmtH(s.min), s: ST.bold }], ['G', 'H', 'I'].map(function (c, i) {
       return { f: 'SUM(' + c + '2:' + c + ml2 + ')', v: round2([s.work, s.own, s.total][i]), s: ST.beur };
     }), [{ f: 'SUM(J2:J' + ml2 + ')', v: list.filter(function (l) { return l.exam; }).length, s: ST.bnum }]));
+    /* derde blad: bonnen */
+    var rl = receipts.filter(function (r) { return r.date >= from && r.date <= to; }).sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+    var brows = [['Datum', 'Winkel', 'Soort kosten', 'Totaal (incl. btw)', 'Btw %', 'Btw', 'Zonder btw', 'Notitie'].map(function (t) { return { v: t, s: ST.head }; })];
+    rl.forEach(function (r) {
+      brows.push([{ v: excelDate(r.date), s: ST.date }, r.shop || '', r.category || '', { v: round2(r.total || 0), s: ST.eur }, (r.rate != null ? r.rate : 21) + '%',
+        { v: round2(r.vat || 0), s: ST.eur }, { v: round2((r.total || 0) - (r.vat || 0)), s: ST.eur }, r.note || '']);
+    });
+    var bl = rl.length + 1, bt = rl.reduce(function (t, r) { return t + (r.total || 0); }, 0), bv = rl.reduce(function (t, r) { return t + (r.vat || 0); }, 0);
+    brows.push(null);
+    brows.push([{ v: 'Totaal', s: ST.bold }, { v: rl.length + (rl.length === 1 ? ' bon' : ' bonnen'), s: ST.bold }, null,
+      { f: 'SUM(D2:D' + bl + ')', v: round2(bt), s: ST.beur }, null, { f: 'SUM(F2:F' + bl + ')', v: round2(bv), s: ST.beur }, { f: 'SUM(G2:G' + bl + ')', v: round2(bt - bv), s: ST.beur }]);
+    CATS.forEach(function (c) {
+      var cl = rl.filter(function (r) { return (r.category || 'Kantoor en overig') === c; }); if (!cl.length) return;
+      brows.push([c, cl.length + (cl.length === 1 ? ' bon' : ' bonnen'), null,
+        { f: 'SUMIF(C2:C' + bl + ',"' + c + '",D2:D' + bl + ')', v: round2(cl.reduce(function (t, r) { return t + (r.total || 0); }, 0)), s: ST.eur }, null,
+        { f: 'SUMIF(C2:C' + bl + ',"' + c + '",F2:F' + bl + ')', v: round2(cl.reduce(function (t, r) { return t + (r.vat || 0); }, 0)), s: ST.eur }]);
+    });
     return workbook([
       { name: 'Lessen', rows: rows, widths: [12, 11, 7, 7, 22, 16, 11, 9, 8, 10, 10, 11, 18, 9], freeze: true },
-      { name: 'Per maand', rows: mrows, widths: [18, 8, 9, 10, 9, 8, 13, 13, 13, 9], freeze: true }
+      { name: 'Per maand', rows: mrows, widths: [18, 8, 9, 10, 9, 8, 13, 13, 13, 9], freeze: true },
+      { name: 'Bonnen', rows: brows, widths: [12, 22, 22, 16, 8, 11, 12, 24], freeze: true }
     ]);
   }
   function exportName(from, to) {
@@ -1218,12 +1377,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       chips.forEach(function (c, i) { c.setAttribute('aria-pressed', presets[i][1] === ex.from && presets[i][2] === ex.to ? 'true' : 'false'); });
       err.textContent = '';
       if (!/^\d{4}-\d{2}-\d{2}$/.test(ex.from) || !/^\d{4}-\d{2}-\d{2}$/.test(ex.to) || ex.to < ex.from) { info.textContent = 'Kies een geldige periode.'; return; }
-      var s = sums(lessonsBetween(ex.from, ex.to));
-      info.textContent = s.n ? s.n + (s.n === 1 ? ' les' : ' lessen') + ' · ' + fmtHM(s.min) + ' · ' + eur(s.total) : 'Geen lessen in deze periode.';
+      var s = sums(lessonsBetween(ex.from, ex.to)), nb = receipts.filter(function (r) { return r.date >= ex.from && r.date <= ex.to; }).length;
+      info.textContent = (s.n ? s.n + (s.n === 1 ? ' les' : ' lessen') + ' · ' + fmtHM(s.min) + ' · ' + eur(s.total) : 'Geen lessen') + (nb ? ' · ' + nb + (nb === 1 ? ' bon' : ' bonnen') : '') + (s.n || nb ? '' : ' in deze periode.');
     }
     var block = [
       h('h3', null, 'Exporteren naar Excel'),
-      h('p', { class: 'hint' }, 'Een overzicht van je lessen met uren en bedragen, plus totalen per maand. Handig voor je administratie en de belastingaangifte.'),
+      h('p', { class: 'hint' }, 'Een overzicht van je lessen met uren en bedragen, totalen per maand en je bonnen met btw. Handig voor je administratie en de belastingaangifte.'),
       h('div', { class: 'chips' }, chips),
       h('div', { class: 'row2 dates' },
         h('div', { class: 'fld' }, h('label', { for: 'x-from' }, 'Van'), fIn),
@@ -1231,13 +1390,474 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       info, err,
       h('div', { class: 'acts' }, h('button', { class: 'btn', type: 'button', id: 'x-go', onclick: function () {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(ex.from) || !/^\d{4}-\d{2}-\d{2}$/.test(ex.to) || ex.to < ex.from) { err.textContent = 'Kies een geldige periode.'; return; }
-        if (!lessonsBetween(ex.from, ex.to).length) { err.textContent = 'Er staan geen lessen in deze periode.'; return; }
+        if (!lessonsBetween(ex.from, ex.to).length && !receipts.some(function (r) { return r.date >= ex.from && r.date <= ex.to; })) { err.textContent = 'Er staan geen lessen of bonnen in deze periode.'; return; }
         try { downloadExcel(ex.from, ex.to); toast('Excel-bestand gemaakt'); }
         catch (x) { err.textContent = 'Het bestand maken lukte niet. Probeer het opnieuw.'; }
       } }, 'Download Excel'))
     ];
     sync();
     return block;
+  }
+
+  /* ---------- menu en pagina's ---------- */
+  var page = 'agenda', pageFresh = true;
+  var PAGES = [
+    ['agenda', 'Agenda', '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8.5 3v4M15.5 3v4"/>'],
+    ['leerlingen', 'Leerlingen', '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-5.5 6.5-5.5s6.5 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17.5 14c2.4 0 4 1.4 4 4"/>'],
+    ['inkomsten', 'Inkomsten', '<path d="M5 20V11M11 20V5M17 20v-6M2.5 20.5h19"/>'],
+    ['bonnen', 'Bonnen', '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>'],
+    ['instellingen', 'Instellingen', '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M2.5 12h3M18.5 12h3M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/>']
+  ];
+  function icon(paths) {
+    var s = document.createElement('span'); s.className = 'ico'; s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
+    return s;
+  }
+  function openDrawer() {
+    closePicker();
+    var open = openTotal();
+    var nav = h('nav', { class: 'drawer', 'aria-label': 'Menu' },
+      h('div', { class: 'dhead' }, h('img', { src: 'icon-192.png', alt: '', width: '40', height: '40' }), h('b', null, 'Karta DrivePlan')),
+      PAGES.map(function (p) {
+        return h('button', { type: 'button', class: 'ditem', 'aria-current': page === p[0] ? 'page' : null, onclick: function () { go(p[0]); } },
+          icon(p[2]), h('span', null, p[1]),
+          p[0] === 'leerlingen' && open > 0 ? h('span', { class: 'dbadge', title: 'Nog te ontvangen' }, eur(open)) : null);
+      }),
+      h('div', { class: 'dfoot' }, user ? h('span', { class: 'hint' }, 'Ingelogd als ' + (user.email || '')) : null));
+    var d = $('drawer'); d.replaceChildren(nav); d.hidden = false;
+    requestAnimationFrame(function () { d.classList.add('open'); });
+    var cur = nav.querySelector('[aria-current]'); if (cur) cur.focus();
+  }
+  function closeDrawer() { var d = $('drawer'); d.classList.remove('open'); d.hidden = true; d.replaceChildren(); }
+  function go(p) { page = p; pageFresh = true; closeDrawer(); closePicker(); render(); window.scrollTo(0, 0); }
+  $('drawer').addEventListener('mousedown', function (e) { if (e.target === $('drawer')) closeDrawer(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('drawer').hidden) closeDrawer(); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-menu]'), function (b) { b.addEventListener('click', openDrawer); });
+
+  function renderPage() {
+    $('ptitle').textContent = { leerlingen: 'Leerlingen', inkomsten: 'Inkomsten', bonnen: 'Bonnen', instellingen: 'Instellingen' }[page] || '';
+    if (problem) { $('ptools').replaceChildren(); $('pbody').replaceChildren(h('div', { class: 'status' }, problem)); return; }
+    if (!loaded) { $('ptools').replaceChildren(); $('pbody').replaceChildren(h('div', { class: 'status' }, 'Laden…')); pageFresh = true; return; }
+    if (page === 'instellingen') { if (pageFresh) renderSettingsPage(); }
+    else if (page === 'leerlingen') renderStudents();
+    else if (page === 'inkomsten') renderIncome();
+    else if (page === 'bonnen') renderReceipts();
+    pageFresh = false;
+  }
+  function stat(label, value, sub, cls) {
+    return h('div', { class: 'stat' + (cls ? ' ' + cls : '') }, h('span', { class: 'lbl' }, label), h('span', { class: 'val' }, value), sub ? h('span', { class: 'hint' }, sub) : null);
+  }
+  function monthNav(cur, step, label, onchange) {
+    return h('div', { class: 'nav' },
+      h('button', { type: 'button', 'aria-label': 'Vorige', onclick: function () { onchange(step(cur, -1)); } }, '‹'),
+      h('button', { type: 'button', class: 'navlbl', onclick: function () { onchange(null); } }, label),
+      h('button', { type: 'button', 'aria-label': 'Volgende', onclick: function () { onchange(step(cur, 1)); } }, '›'));
+  }
+
+  /* ---------- leerlingen ---------- */
+  var studentQuery = '', studentSort = 'recent';
+  function studentKey(n) { return String(n || '').trim().toLowerCase().replace(/\s+/g, ' '); }
+  function isPast(l) { var td = todayStr(); return l.date < td || (l.date === td && toMin(l.start) <= nowMin()); }
+  function isOpenPay(l) { return srcOf(l) === 'own' && !l.paid && isPast(l); }
+  function openTotal() { return lessons.reduce(function (s, l) { return s + (isOpenPay(l) ? priceOf(l) : 0); }, 0); }
+  function byWhen(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : toMin(a.start) - toMin(b.start); }
+  function studentsList() {
+    var map = {};
+    lessons.forEach(function (l) {
+      var k = studentKey(l.name); if (!k) return;
+      (map[k] || (map[k] = { key: k, list: [] })).list.push(l);
+    });
+    return Object.keys(map).map(function (k) {
+      var s = map[k];
+      s.list.sort(byWhen);
+      var past = s.list.filter(isPast), fut = s.list.filter(function (l) { return !isPast(l); });
+      s.name = String(s.list[s.list.length - 1].name).trim();
+      s.past = past; s.fut = fut;
+      s.last = past[past.length - 1] || null; s.next = fut[0] || null;
+      s.sum = sums(s.list); s.pastSum = sums(past);
+      var g = s.list.slice().reverse().filter(function (l) { return splitGear(l.tags).gear; })[0];
+      s.gear = g ? splitGear(g.tags).gear : '';
+      var exams = s.list.filter(function (l) { return l.exam; });
+      s.examNext = exams.filter(function (l) { return !isPast(l); })[0] || null;
+      s.examLast = exams.filter(isPast).pop() || null;
+      var open = s.list.filter(isOpenPay);
+      s.open = open.reduce(function (t, l) { return t + priceOf(l); }, 0); s.openList = open;
+      var own = s.list.filter(function (l) { return srcOf(l) === 'own'; }).length;
+      s.src = own * 2 >= s.list.length ? 'own' : 'work';
+      s.mixed = own > 0 && own < s.list.length;
+      s.lastWhen = (s.last || s.next).date;
+      return s;
+    });
+  }
+  function initials(n) { return n.split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join('') || '?'; }
+  function dayLabel(d) { return DAYS_SHORT[(parseYmd(d).getUTCDay() + 6) % 7] + ' ' + shortDate(d); }
+  function renderStudents() {
+    if (pageFresh || !$('st-list')) {
+      $('ptools').replaceChildren();
+      var sortBtns = [['recent', 'Recent'], ['naam', 'A–Z'], ['open', 'Openstaand']].map(function (o) {
+        return h('button', { type: 'button', class: 'chip', 'data-sort': o[0], 'aria-pressed': studentSort === o[0] ? 'true' : 'false', onclick: function () {
+          studentSort = o[0]; Array.prototype.forEach.call(document.querySelectorAll('[data-sort]'), function (b) { b.setAttribute('aria-pressed', b.dataset.sort === studentSort ? 'true' : 'false'); }); fillStudents(); } }, o[1]);
+      });
+      $('pbody').replaceChildren(
+        h('div', { class: 'stats', id: 'st-sum' }),
+        h('input', { type: 'search', class: 'search', placeholder: 'Zoek een leerling', 'aria-label': 'Zoek een leerling', value: studentQuery,
+          autocomplete: 'off', oninput: function (e) { studentQuery = e.target.value; fillStudents(); } }),
+        h('div', { class: 'chips' }, sortBtns),
+        h('div', { class: 'slist', id: 'st-list' }));
+    }
+    fillStudents();
+  }
+  function fillStudents() {
+    var all = studentsList(), q = studentKey(studentQuery);
+    var open = all.reduce(function (t, s) { return t + s.open; }, 0), exams = all.filter(function (s) { return s.examNext; }).length;
+    $('st-sum').replaceChildren(
+      stat('Leerlingen', String(all.length), all.filter(function (s) { return s.next; }).length + ' met een geplande les'),
+      stat('Nog te ontvangen', eur(open), open > 0 ? 'van ' + cfg.ownName + '-lessen die al geweest zijn' : 'Alles is betaald', open > 0 ? 'warn' : ''),
+      stat('Examens gepland', String(exams), exams ? 'eerstvolgende: ' + dayLabel(all.filter(function (s) { return s.examNext; }).map(function (s) { return s.examNext.date; }).sort()[0]) : 'geen'));
+    var list = all.filter(function (s) { return !q || s.key.indexOf(q) !== -1; });
+    list.sort(function (a, b) {
+      if (studentSort === 'naam') return a.name.localeCompare(b.name, 'nl');
+      if (studentSort === 'open') return b.open - a.open || a.name.localeCompare(b.name, 'nl');
+      return a.lastWhen < b.lastWhen ? 1 : a.lastWhen > b.lastWhen ? -1 : 0;
+    });
+    if (!all.length) { $('st-list').replaceChildren(h('div', { class: 'status' }, 'Nog geen leerlingen. Ze verschijnen hier vanzelf zodra je lessen in je agenda zet.')); return; }
+    if (!list.length) { $('st-list').replaceChildren(h('div', { class: 'status' }, 'Geen leerling gevonden met "' + studentQuery.trim() + '".')); return; }
+    $('st-list').replaceChildren.apply($('st-list'), list.map(function (s) {
+      var sub = [s.pastSum.n + (s.pastSum.n === 1 ? ' les' : ' lessen'), fmtH(s.pastSum.min)];
+      if (s.gear) sub.push(s.gear);
+      return h('button', { type: 'button', class: 'strow', onclick: function () { openStudent(s.key); } },
+        h('span', { class: 'av ' + s.src + (s.mixed ? ' mixed' : '') }, initials(s.name)),
+        h('span', { class: 'stmain' }, h('b', null, s.name), h('span', null, sub.join(' · '))),
+        h('span', { class: 'stside' },
+          s.examNext ? h('span', { class: 'badge exam' }, 'Examen ' + dayLabel(s.examNext.date)) : null,
+          s.open > 0 ? h('span', { class: 'badge open' }, eur(s.open) + ' open') : null,
+          s.next && !s.examNext ? h('span', { class: 'badge next' }, 'Volgende: ' + dayLabel(s.next.date)) : null));
+    }));
+  }
+  function setPaid(list, val) { list.forEach(function (l) { var b = Object.assign({}, l); b.paid = val; db.put(l.id, b); }); }
+  function openStudent(key) {
+    var s = studentsList().filter(function (x) { return x.key === key; })[0];
+    if (!s) { closeModal(); return; }
+    draft = { settings: true };
+    var facts = [
+      ['Lessen gehad', s.pastSum.n + ' · ' + fmtH(s.pastSum.min)],
+      ['Gepland', s.fut.length ? s.fut.length + (s.fut.length === 1 ? ' les' : ' lessen') : 'geen'],
+      ['Schakel / automaat', s.gear || 'niet ingevuld'],
+      ['Examen', s.examNext ? dayLabel(s.examNext.date) + ' ' + s.examNext.start : s.examLast ? 'gehad op ' + dayLabel(s.examLast.date) : 'nog niet gepland'],
+      ['Totaal verdiend', eur(s.pastSum.total)],
+      ['Nog te ontvangen', s.open > 0 ? eur(s.open) : '€ 0']
+    ];
+    var rows = s.list.slice().reverse().map(function (l) {
+      var own = srcOf(l) === 'own', past = isPast(l);
+      return h('div', { class: 'lrow' + (past ? '' : ' future') },
+        h('button', { type: 'button', class: 'lmain', onclick: function () { closeModal(); openLesson(l); } },
+          h('b', null, dayLabel(l.date) + ' ' + parseYmd(l.date).getUTCFullYear() + ' · ' + l.start),
+          h('span', null, [srcOf(l) === 'own' ? cfg.ownName : cfg.workName, kindName(l)].concat(l.exam ? ['Examen'] : []).concat(past ? [] : ['gepland']).join(' · '))),
+        h('span', { class: 'amt' }, eur(priceOf(l))),
+        own ? h('label', { class: 'paid' }, h('input', { type: 'checkbox', checked: !!l.paid, onchange: function (e) {
+          setPaid([l], e.target.checked); setTimeout(function () { openStudent(key); }, 80); } }), 'Betaald') :
+          h('span', { class: 'paid na', title: 'Wordt via ' + cfg.workName + ' betaald' }, cfg.workName));
+    });
+    $('ov').replaceChildren(h('div', { class: 'card' },
+      h('div', { class: 'sthead' }, h('span', { class: 'av big ' + s.src }, initials(s.name)), h('h2', null, s.name)),
+      h('div', { class: 'facts' }, facts.map(function (f) { return h('div', { class: 'fact' + (f[0] === 'Nog te ontvangen' && s.open > 0 ? ' warn' : '') }, h('small', null, f[0]), h('b', null, f[1])); })),
+      s.open > 0 ? h('div', { class: 'acts' }, h('button', { class: 'btn primary', type: 'button', onclick: function () {
+        setPaid(s.openList, true); toast(s.name + ': alles betaald'); setTimeout(function () { openStudent(key); }, 80); } }, 'Alles betaald (' + eur(s.open) + ')')) : null,
+      h('h3', null, 'Lessen'),
+      h('div', { class: 'llist' }, rows),
+      h('p', { class: 'hint' }, 'Tik op een les om hem te wijzigen. Alleen ' + cfg.ownName + '-lessen hoeven bij jou betaald te worden.'),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn', type: 'button', onclick: function () {
+          closeModal(); openLesson(null, todayStr(), null, false, { name: s.name, source: (s.last || s.next).source === 'own' ? 'own' : 'work', gear: s.gear }); } }, '+ Les voor ' + s.name.split(' ')[0]),
+        h('span', { class: 'sp' }),
+        h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten'))));
+    $('ov').hidden = false;
+  }
+
+  /* ---------- inkomsten ---------- */
+  var incomeYear = null;
+  function renderIncome() {
+    var y = incomeYear || Number(todayStr().slice(0, 4)), first = y + '-01-01', last = y + '-12-31';
+    $('ptools').replaceChildren(monthNav(y, function (v, d) { return v + d; }, String(y), function (v) { incomeYear = v; pageFresh = true; render(); }));
+    var yl = lessonsBetween(first, last), s = sums(yl), ex = yl.filter(function (l) { return l.exam; }).length;
+    var yr = receipts.filter(function (r) { return r.date >= first && r.date <= last; });
+    var cost = yr.reduce(function (t, r) { return t + (r.total || 0); }, 0), vat = yr.reduce(function (t, r) { return t + (r.vat || 0); }, 0);
+    var months = [], max = 0;
+    for (var m = 0; m < 12; m++) {
+      var mf = y + '-' + pad(m + 1) + '-01', ml = addDays(addMonths(mf, 1), -1), ls = lessonsBetween(mf, ml), ms = sums(ls);
+      var mc = receipts.filter(function (r) { return r.date >= mf && r.date <= ml; }).reduce(function (t, r) { return t + (r.total || 0); }, 0);
+      months.push({ first: mf, s: ms, cost: mc }); max = Math.max(max, ms.total);
+    }
+    var cur = todayStr().slice(0, 7);
+    $('pbody').replaceChildren(
+      h('div', { class: 'stats' },
+        stat('Verdiend in ' + y, eur(s.total), cfg.workName + ' ' + eur(s.work) + ' · ' + cfg.ownName + ' ' + eur(s.own)),
+        stat('Uren', fmtH(s.min), '(' + s.min + ' min)'),
+        stat('Lessen', String(s.n), yl.filter(function (l) { return dur(l) === 2 * UNIT; }).length + ' blokuur · ' + yl.filter(function (l) { return dur(l) === UNIT; }).length + ' enkel · ' + ex + (ex === 1 ? ' examen' : ' examens')),
+        stat('Kosten (bonnen)', eur(cost), yr.length ? eur(vat) + ' btw terug te vragen' : 'nog geen bonnen')),
+      h('div', { class: 'slist months' },
+        h('div', { class: 'mhead' }, h('span', null, 'Per maand'), h('span', { class: 'mleg' }, h('i', { class: 'dot work' }), cfg.workName, h('i', { class: 'dot own' }), cfg.ownName)),
+        months.map(function (mo) {
+          var mi = parseYmd(mo.first).getUTCMonth(), w = max ? mo.s.work / max * 100 : 0, o = max ? mo.s.own / max * 100 : 0;
+          return h('button', { type: 'button', class: 'mrow' + (mo.first.slice(0, 7) === cur ? ' cur' : ''), onclick: function () { page = 'agenda'; cursor = mo.first; view = 'month'; render(); window.scrollTo(0, 0); } },
+            h('b', { class: 'mname' }, MON_LONG[mi]),
+            h('span', { class: 'mbar', 'aria-hidden': 'true' }, h('i', { class: 'w', style: 'width:' + w + '%' }), h('i', { class: 'o', style: 'width:' + o + '%' })),
+            h('b', { class: 'mamt' + (mo.s.n ? '' : ' zero') }, mo.s.n ? eur(mo.s.total) : '–'),
+            h('span', { class: 'msub' }, mo.s.n ? mo.s.n + ' lessen · ' + fmtHM(mo.s.min) + (mo.cost ? ' · kosten ' + eur(mo.cost) : '') : (mo.cost ? 'kosten ' + eur(mo.cost) : 'geen lessen')));
+        })),
+      h('div', { class: 'card flat' }, exportBlock()));
+  }
+
+  /* ---------- instellingen ---------- */
+  function renderSettingsPage() {
+    $('ptools').replaceChildren();
+    $('pbody').replaceChildren(accountCard(false, true));
+  }
+
+  /* ---------- bonnen: foto maken, automatisch uitlezen, btw per maand ---------- */
+  var receipts = [], rcMonth = null;
+  var CATS = ['Brandstof', 'Onderhoud en reparatie', 'Parkeren en wassen', 'Telefoon en internet', 'Kantoor en overig'];
+  var RATES = [21, 9, 0];
+  function cleanReceipt(b) {
+    var o = {};
+    ['date', 'shop', 'category', 'total', 'vat', 'rate', 'note', 'thumb', 'hasPhoto', 'created'].forEach(function (k) { if (b && b[k] !== undefined) o[k] = b[k]; });
+    return o;
+  }
+  function money(v) { var n = parseFloat(String(v == null ? '' : v).trim().replace(/\s/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return isNaN(n) ? NaN : Math.round(n * 100) / 100; }
+  function moneyTxt(v) { return v == null || v === '' || isNaN(v) ? '' : (Math.round(v * 100) / 100).toFixed(2).replace('.', ','); }
+  function vatFrom(total, rate) { return Math.round(total * rate / (100 + rate) * 100) / 100; }
+
+  function renderReceipts() {
+    var mf = rcMonth || addMonths(todayStr(), 0), ml = addDays(addMonths(mf, 1), -1), mi = parseYmd(mf).getUTCMonth(), yy = parseYmd(mf).getUTCFullYear();
+    $('ptools').replaceChildren(monthNav(mf, addMonths, MON[mi] + ' ' + yy, function (v) { rcMonth = v; render(); }));
+    var list = receipts.filter(function (r) { return r.date >= mf && r.date <= ml; }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : (b.created || 0) - (a.created || 0); });
+    var tot = list.reduce(function (t, r) { return t + (r.total || 0); }, 0), vat = list.reduce(function (t, r) { return t + (r.vat || 0); }, 0);
+    var perCat = {};
+    list.forEach(function (r) { var c = r.category || 'Kantoor en overig'; perCat[c] = (perCat[c] || 0) + (r.total || 0); });
+    var file = h('input', { type: 'file', accept: 'image/*', hidden: true, onchange: function (e) { var f = e.target.files[0]; e.target.value = ''; if (f) handlePhoto(f); } });
+    $('pbody').replaceChildren(
+      h('div', { class: 'rcact' },
+        h('button', { type: 'button', class: 'btn primary big cam', onclick: function () { file.click(); } },
+          icon('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'), 'Foto van bon'),
+        h('button', { type: 'button', class: 'btn big', onclick: function () { openReceipt(null); } }, 'Zonder foto'),
+        file),
+      h('div', { class: 'stats' },
+        stat('Uitgegeven in ' + MON_LONG[mi], eur(tot), list.length + (list.length === 1 ? ' bon' : ' bonnen')),
+        stat('Btw terug te vragen', eur(vat), 'excl. btw ' + eur(tot - vat), vat > 0 ? 'good' : '')),
+      Object.keys(perCat).length ? h('div', { class: 'panel cats' }, CATS.filter(function (c) { return perCat[c]; }).map(function (c) {
+        return h('div', { class: 'catline' }, h('span', null, c), h('b', null, eur(perCat[c])));
+      })) : null,
+      h('div', { class: 'slist' }, list.length ? list.map(function (r) {
+        return h('button', { type: 'button', class: 'rcrow', onclick: function () { openReceipt(r); } },
+          r.thumb ? h('img', { class: 'rcthumb', src: r.thumb, alt: '' }) : h('span', { class: 'rcthumb none' }, icon('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/>')),
+          h('span', { class: 'stmain' }, h('b', null, r.shop || r.category || 'Bon'), h('span', null, dayLabel(r.date) + ' · ' + (r.category || 'Overig'))),
+          h('span', { class: 'stside' }, h('b', { class: 'rcamt' }, eur(r.total || 0)), h('span', { class: 'hint' }, 'btw ' + eur(r.vat || 0))));
+      }) : h('div', { class: 'status' }, 'Nog geen bonnen in ' + MON_LONG[mi] + '. Tik op Foto van bon en maak een foto van bijvoorbeeld je tankbon: de app leest het bedrag en de btw zelf uit.')),
+      h('p', { class: 'hint' }, 'Het uitlezen is een hulpmiddel: controleer de bedragen even. Of je de btw echt mag aftrekken hangt af van je situatie; vraag het bij twijfel na bij je boekhouder.'));
+  }
+
+  /* Foto verkleinen: groot genoeg om te lezen, klein genoeg om op te slaan */
+  function loadImage(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () { res(img); setTimeout(function () { URL.revokeObjectURL(url); }, 1000); };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('img')); };
+      img.src = url;
+    });
+  }
+  function scaled(img, max, gray) {
+    var r = Math.min(1, max / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
+    var c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round((img.naturalWidth || img.width) * r)); c.height = Math.max(1, Math.round((img.naturalHeight || img.height) * r));
+    var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    if (gray) {
+      var d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+      for (var i = 0; i < p.length; i += 4) { var v = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2]; v = v > 165 ? 255 : v < 90 ? 0 : (v - 90) * 3.4; p[i] = p[i + 1] = p[i + 2] = v; }
+      x.putImageData(d, 0, 0);
+    }
+    return c;
+  }
+  function jpeg(img, max, q) { return scaled(img, max).toDataURL('image/jpeg', q); }
+
+  /* Tekst herkennen op de bon (Tesseract, draait in je eigen browser; de foto gaat niet naar een andere dienst) */
+  var tessWorker = null, ocrProgress = null;
+  function loadScript(src) {
+    return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+  }
+  async function ocr(canvas) {
+    if (!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+    if (!tessWorker) tessWorker = await Tesseract.createWorker('nld', 1, { logger: function (m) { if (ocrProgress) ocrProgress(m); } });
+    var r = await tessWorker.recognize(canvas);
+    return r.data.text || '';
+  }
+  var BRANDS = ['Shell', 'BP', 'Esso', 'TotalEnergies', 'Total', 'Tango', 'Tinq', 'Texaco', 'Gulf', 'Argos', 'Avia', 'Q8', 'Firezone', 'Lukoil', 'Makro', 'Albert Heijn', 'Jumbo', 'Kruidvat', 'Action', 'Halfords', 'Kwik-Fit', 'Euromaster', 'Carglass', 'Q-Park', 'Interparking', 'Mediamarkt', 'Coolblue', 'KPN', 'Vodafone', 'Odido', 'Ziggo'];
+  function amountsIn(line) {
+    var out = [], re = /(\d{1,4}(?:\.\d{3})*,\d{2}|\d{1,4}\.\d{2})(?!\d)/g, m;
+    while ((m = re.exec(line))) {
+      var raw = m[1], v = /,\d{2}$/.test(raw) ? parseFloat(raw.replace(/\./g, '').replace(',', '.')) : parseFloat(raw);
+      if (!isNaN(v)) out.push(v);
+    }
+    return out;
+  }
+  function parseReceipt(text) {
+    var lines = text.split(/\r?\n/).map(function (l) {
+      return l.replace(/(\d)\s*[,.]\s*(\d{2})(?!\d)/g, '$1,$2').replace(/(\d)[oO]/g, function (a, d) { return d + '0'; }).replace(/[|]/g, ' ').trim();
+    }).filter(Boolean);
+    var low = lines.map(function (l) { return l.toLowerCase(); }), all = low.join('\n');
+    var r = { total: null, vat: null, rate: null, date: null, shop: '', category: '', liters: null };
+    var best = null;
+    lines.forEach(function (l, i) {
+      var lw = low[i];
+      if (/sub\s*-?\s*totaal|subtotal|excl|b\.?t\.?w|vat|korting|wisselgeld|retour|statiegeld|spaar/.test(lw)) return;
+      var score = /te betalen|totaal|total|tot\./.test(lw) ? 3 : /betaald|bedrag|pin(nen)?\b|maestro|v ?pay|visa|mastercard|contactloos|eur\b/.test(lw) ? 2 : 0;
+      if (!score) return;
+      var am = amountsIn(l);
+      if (!am.length && lines[i + 1]) am = amountsIn(lines[i + 1]);
+      am.forEach(function (v) { if (v > 0 && v < 5000 && (!best || score > best.s || (score === best.s && v > best.v))) best = { v: v, s: score }; });
+    });
+    if (best) r.total = best.v;
+    else {
+      var every = []; lines.forEach(function (l) { every = every.concat(amountsIn(l)); });
+      every = every.filter(function (v) { return v > 0 && v < 5000; });
+      if (every.length) r.total = Math.max.apply(null, every);
+    }
+    r.rate = /(^|[^\d])21[,.]?0*\s*%|\bhoog\b/.test(all) ? 21 : /(^|[^\d,.])9[,.]?0*\s*%|\blaag\b/.test(all) ? 9 : 21;
+    if (r.total) {
+      var expect = vatFrom(r.total, r.rate), cand = null;
+      lines.forEach(function (l, i) {
+        if (!/b\.?t\.?w|vat|%/.test(low[i])) return;
+        amountsIn(l).concat(lines[i + 1] && !amountsIn(l).length ? amountsIn(lines[i + 1]) : []).forEach(function (v) {
+          var diff = Math.abs(v - expect);
+          if (diff <= Math.max(0.06, expect * 0.03) && (!cand || diff < cand.d)) cand = { v: v, d: diff };
+        });
+      });
+      r.vat = cand ? cand.v : expect;
+      r.vatRead = !!cand;
+    }
+    var dm = all.match(/(\d{1,2})[-\/.](\d{1,2})[-\/.](20\d{2}|\d{2})(?!\d)/) || null, iso = all.match(/(20\d{2})-(\d{2})-(\d{2})/);
+    var cand2 = null;
+    if (iso) cand2 = iso[1] + '-' + iso[2] + '-' + iso[3];
+    else if (dm) { var yy = dm[3].length === 2 ? '20' + dm[3] : dm[3]; cand2 = yy + '-' + pad(Number(dm[2])) + '-' + pad(Number(dm[1])); }
+    if (cand2 && /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(cand2) && cand2 <= addDays(todayStr(), 1) && cand2 >= addDays(todayStr(), -800)) r.date = cand2;
+    BRANDS.some(function (b) { if (new RegExp('(^|[^a-z])' + b.toLowerCase().replace(/[-.]/g, '.?') + '([^a-z]|$)').test(all)) { r.shop = b; return true; } return false; });
+    if (!r.shop) {
+      var first = lines.filter(function (l) { return (l.match(/[a-zA-Z]/g) || []).length >= 3; })[0];
+      if (first) r.shop = first.replace(/[^\wÀ-ÿ&' .-]/g, '').trim().slice(0, 30);
+    }
+    if (/liter|\bltr\b|euro ?95|euro ?98|\be10\b|\be5\b|diesel|benzine|ongelood|\blpg\b|adblue|pomp\s*\d|brandstof/.test(all) || /^(Shell|BP|Esso|TotalEnergies|Total|Tango|Tinq|Texaco|Gulf|Argos|Avia|Q8|Firezone|Lukoil)$/.test(r.shop)) r.category = 'Brandstof';
+    else if (/parkeer|parking|q-?park|wasstraat|carwash|car wash|autowas/.test(all)) r.category = 'Parkeren en wassen';
+    else if (/garage|\bapk\b|banden|onderhoud|reparatie|kwik|euromaster|halfords|carglass|ruitenwisser|olie/.test(all)) r.category = 'Onderhoud en reparatie';
+    else if (/kpn|vodafone|odido|ziggo|t-mobile|telefoon|abonnement/.test(all)) r.category = 'Telefoon en internet';
+    var lt = all.match(/(\d{1,3}[,.]\d{1,3})\s*(l|ltr|liter)\b/);
+    if (lt) r.liters = lt[1].replace('.', ',');
+    return r;
+  }
+
+  async function handlePhoto(file) {
+    var img;
+    try { img = await loadImage(file); }
+    catch (e) { toast('Deze foto kan niet geopend worden. Probeer een andere.'); return; }
+    var rc = { id: null, date: todayStr(), shop: '', category: 'Brandstof', total: null, rate: 21, vat: null, note: '',
+      photo: jpeg(img, 1100, 0.62), thumb: jpeg(img, 140, 0.6), newPhoto: true, reading: true };
+    openReceipt(rc);
+    var st = $('r-status');
+    ocrProgress = function (m) {
+      var el = $('r-status'); if (!el || !draft || draft.rc !== rc) return;
+      if (m.status === 'recognizing text') el.textContent = 'Bon lezen… ' + Math.round((m.progress || 0) * 100) + '%';
+      else if (/load/.test(m.status || '')) el.textContent = 'Bon lezen… (de eerste keer duurt het iets langer)';
+    };
+    try {
+      var text = await ocr(scaled(img, 1800, true));
+      var r = parseReceipt(text);
+      if (!draft || draft.rc !== rc) return;
+      var f = draft.rc;
+      if ($('r-date')) { f.date = $('r-date').value || f.date; f.shop = $('r-shop').value.trim(); f.note = $('r-note').value.trim(); }
+      if (r.date) f.date = r.date;
+      if (r.shop && !f.shop) f.shop = r.shop;
+      if (r.category) f.category = r.category;
+      if (r.rate != null) f.rate = r.rate;
+      if (r.total) { f.total = r.total; f.vat = r.vat; f.vatTouched = false; }
+      if (r.liters && !f.note) f.note = r.liters + ' liter';
+      f.reading = false;
+      f.status = r.total ? (r.vatRead ? 'Gelezen van de bon. Controleer de bedragen even.' : 'Totaal gelezen; de btw is uitgerekend (' + f.rate + '%). Controleer het even.') : 'Het totaalbedrag kon niet gelezen worden. Vul het zelf in.';
+      f.statusCls = r.total ? 'ok' : 'warn';
+      buildReceipt();
+    } catch (e) {
+      if (!draft || draft.rc !== rc) return;
+      rc.reading = false; rc.status = 'Automatisch lezen lukte niet (geen internet?). Vul de bedragen zelf in.'; rc.statusCls = 'warn';
+      buildReceipt();
+    }
+  }
+
+  function openReceipt(r) {
+    var rc = r && r.newPhoto ? r : r ? { id: r.id, date: r.date, shop: r.shop || '', category: r.category || 'Kantoor en overig', total: r.total, rate: r.rate != null ? r.rate : 21,
+      vat: r.vat, note: r.note || '', thumb: r.thumb || null, hasPhoto: !!r.hasPhoto, created: r.created, vatTouched: true } :
+      { id: null, date: todayStr(), shop: '', category: 'Brandstof', total: null, rate: 21, vat: null, note: '', vatTouched: false };
+    draft = { settings: true, rc: rc, confirmDel: false };
+    buildReceipt();
+    if (rc.id && rc.hasPhoto && !rc.photo) {
+      db.getImage(rc.id).then(function (src) { if (src && draft && draft.rc === rc) { rc.photo = src; var im = $('r-img'); if (im) im.src = src; } }).catch(function () {});
+    }
+  }
+  function buildReceipt() {
+    var rc = draft.rc, isNew = !rc.id;
+    function recalc() {
+      var t = money($('r-total').value);
+      if (!rc.vatTouched && !isNaN(t)) { rc.vat = vatFrom(t, rc.rate); $('r-vat').value = moneyTxt(rc.vat); }
+      var v = money($('r-vat').value);
+      $('r-excl').textContent = !isNaN(t) ? eur(t - (isNaN(v) ? 0 : v)) : '–';
+    }
+    var rateBtns = RATES.map(function (p) {
+      return h('button', { type: 'button', 'aria-pressed': rc.rate === p ? 'true' : 'false', onclick: function () {
+        rc.rate = p; rc.vatTouched = false; rateBtns.forEach(function (b, i) { b.setAttribute('aria-pressed', RATES[i] === p ? 'true' : 'false'); }); recalc(); } }, p + '%');
+    });
+    var catBtns = CATS.map(function (c) {
+      return h('button', { type: 'button', class: 'chip', 'aria-pressed': rc.category === c ? 'true' : 'false', onclick: function () {
+        rc.category = c; catBtns.forEach(function (b, i) { b.setAttribute('aria-pressed', CATS[i] === c ? 'true' : 'false'); }); } }, c);
+    });
+    var photo = rc.photo || rc.thumb;
+    var card = h('form', { class: 'card', onsubmit: function (e) { e.preventDefault(); saveReceipt(); } },
+      h('h2', null, isNew ? 'Nieuwe bon' : 'Bon'),
+      photo ? h('img', { id: 'r-img', class: 'rcphoto', src: photo, alt: 'Foto van de bon', onclick: function (e) { e.target.classList.toggle('big'); } }) : null,
+      rc.reading || rc.status ? h('div', { id: 'r-status', class: 'rcstatus ' + (rc.reading ? '' : rc.statusCls || 'ok'), role: 'status' }, rc.reading ? 'Bon lezen…' : rc.status) : null,
+      h('div', { class: 'row2 dates' },
+        h('div', { class: 'fld' }, h('label', { for: 'r-date' }, 'Datum'), h('input', { type: 'date', id: 'r-date', value: rc.date })),
+        h('div', { class: 'fld' }, h('label', { for: 'r-shop' }, 'Winkel / tankstation'), h('input', { type: 'text', id: 'r-shop', autocomplete: 'off', maxlength: '40', value: rc.shop, placeholder: 'Bijv. Shell' }))),
+      h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Soort kosten'), h('div', { class: 'chips' }, catBtns)),
+      h('div', { class: 'row2 dates' },
+        h('div', { class: 'fld' }, h('label', { for: 'r-total' }, 'Totaal (incl. btw)'),
+          h('input', { type: 'text', id: 'r-total', inputmode: 'decimal', autocomplete: 'off', placeholder: '0,00', value: moneyTxt(rc.total), disabled: !!rc.reading, oninput: recalc })),
+        h('div', { class: 'fld' }, h('label', { for: 'r-vat' }, 'Btw-bedrag'),
+          h('input', { type: 'text', id: 'r-vat', inputmode: 'decimal', autocomplete: 'off', placeholder: '0,00', value: moneyTxt(rc.vat), disabled: !!rc.reading,
+            oninput: function () { rc.vatTouched = true; recalc(); } }))),
+      h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Btw-tarief'), h('div', { class: 'seg' }, rateBtns)),
+      h('div', { class: 'total' }, h('span', null, 'Zonder btw'), h('b', { id: 'r-excl' }, '–')),
+      h('div', { class: 'fld' }, h('label', { for: 'r-note' }, 'Notitie (optioneel)'), h('input', { type: 'text', id: 'r-note', autocomplete: 'off', maxlength: '80', value: rc.note })),
+      h('div', { class: 'err', id: 'r-err', role: 'alert' }),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn primary', type: 'submit', disabled: !!rc.reading }, isNew ? 'Opslaan' : 'Wijzigingen opslaan'),
+        h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Annuleren'),
+        h('span', { class: 'sp' }),
+        isNew ? null : h('button', { class: 'btn danger', type: 'button', id: 'r-del', onclick: function () {
+          if (!draft.confirmDel) { draft.confirmDel = true; $('r-del').textContent = 'Zeker weten? Verwijder'; return; }
+          db.removeReceipt(rc.id); closeModal(); toast('Bon verwijderd'); } }, 'Verwijderen')));
+    $('ov').replaceChildren(card); $('ov').hidden = false;
+    recalc();
+  }
+  function saveReceipt() {
+    var rc = draft.rc, err = $('r-err');
+    var t = money($('r-total').value), v = money($('r-vat').value), d = $('r-date').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { err.textContent = 'Kies een datum.'; return; }
+    if (isNaN(t) || t <= 0) { err.textContent = 'Vul het totaalbedrag in.'; return; }
+    if (isNaN(v)) v = vatFrom(t, rc.rate);
+    if (v < 0 || v > t) { err.textContent = 'Het btw-bedrag klopt niet: het moet tussen 0 en het totaal liggen.'; return; }
+    var id = rc.id || 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    var meta = { date: d, shop: $('r-shop').value.trim(), category: rc.category, total: t, vat: v, rate: rc.rate, note: $('r-note').value.trim(),
+      thumb: rc.thumb || null, hasPhoto: !!(rc.newPhoto || rc.hasPhoto), created: rc.created || Date.now() };
+    if (!meta.thumb) delete meta.thumb;
+    db.putReceipt(id, meta, rc.newPhoto ? rc.photo : null);
+    rcMonth = d.slice(0, 7) + '-01';
+    closeModal(); render(); toast('Bon opgeslagen');
   }
 
   /* ---------- inlogscherm ---------- */
@@ -1258,7 +1878,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   };
   function authMsg(x) { return AUTH_MSG[x && x.code] || 'Dat lukte niet. Probeer het opnieuw.'; }
   function showGate() {
-    $('app').hidden = true; $('gate').hidden = false;
+    $('app').hidden = true; $('page').hidden = true; closeDrawer(); $('gate').hidden = false;
     var up = authMode === 'up';
     function tab(mode, label) {
       return h('button', { type: 'button', 'aria-pressed': authMode === mode ? 'true' : 'false', onclick: function () {
@@ -1381,7 +2001,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         return;
       }
       store('rp-has-account', '1');
-      $('gate').hidden = true; $('gate').replaceChildren(); $('app').hidden = false;
+      $('gate').hidden = true; $('gate').replaceChildren(); $('app').hidden = false; page = 'agenda'; pageFresh = true;
       cursor = todayStr(); scrolled = false;
       start(cloudDb(u.uid));
     });

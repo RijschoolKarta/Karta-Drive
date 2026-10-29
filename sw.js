@@ -1,5 +1,5 @@
 /* Karta DrivePlan: laatste versie bij elke start, en werkt ook zonder internet */
-var CACHE = 'karta-drive-v12';
+var CACHE = 'karta-drive-v13';
 var CORE = ['./', 'index.html', 'firebase-config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'icon-maskable-512.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));
