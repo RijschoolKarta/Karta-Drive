@@ -7,7 +7,7 @@ service cloud.firestore {
       match /lessons/{lessonId} {
         allow read, delete: if request.auth != null && request.auth.uid == uid;
         allow create, update: if request.auth != null && request.auth.uid == uid
-          && request.resource.data.keys().hasOnly(['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags'])
+          && request.resource.data.keys().hasOnly(['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags', 'exam'])
           && request.resource.data.date is string && request.resource.data.name is string;
       }
     }

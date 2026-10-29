@@ -37,6 +37,9 @@
   --workE-ink: #0A5A50;
   --ownE-bg: #F7D3CC;
   --ownE-ink: #8A2B1F;
+  --exam-bg: #E8DAFB;
+  --exam-ink: #4A1D8C;
+  --exam-line: #7C3AED;
   --now: #D93025;
   --danger: #B3261E;
   --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
@@ -47,7 +50,7 @@
     --bg: #11161C; --surface: #19212A; --ink: #E7ECF0; --muted: #9AA7B3; --line: #26303B; --line-strong: #36424F;
     --accent: #5FA6F2; --accent-ink: #08121C; --accent-soft: #16293D;
     --work-bg: #1F3B5A; --work-ink: #A9D0F7; --own-bg: #4A3412; --own-ink: #F2C788;
-    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE;
+    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE; --exam-bg: #3B2560; --exam-ink: #DCC8FB; --exam-line: #A97CF5;
     --now: #FF6B5F; --danger: #F2867F;
     color-scheme: dark;
   }
@@ -56,7 +59,7 @@
   --bg: #11161C; --surface: #19212A; --ink: #E7ECF0; --muted: #9AA7B3; --line: #26303B; --line-strong: #36424F;
   --accent: #5FA6F2; --accent-ink: #08121C; --accent-soft: #16293D;
   --work-bg: #1F3B5A; --work-ink: #A9D0F7; --own-bg: #4A3412; --own-ink: #F2C788;
-    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE;
+    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE; --exam-bg: #3B2560; --exam-ink: #DCC8FB; --exam-line: #A97CF5;
   --now: #FF6B5F; --danger: #F2867F;
   color-scheme: dark;
 }
@@ -266,6 +269,23 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .acct { display: inline-flex; align-items: center; gap: 6px; }
 .acct svg { width: 16px; height: 16px; }
 @media (max-width: 640px) { .card input[type="text"], .card input[type="number"], .card input[type="time"], .card input[type="date"] { font-size: 16px; } }
+/* Examen: eigen paarse kleur, gaat voor de kleur van de rijschool */
+.blk.exam, .blk.exam.enkel { background: var(--exam-bg); color: var(--exam-ink); box-shadow: inset 3px 0 0 var(--exam-line); }
+.pill.exam, .pill.exam.enkel { background: var(--exam-bg); color: var(--exam-ink); }
+.sw.exam { background: var(--exam-bg); border-color: var(--exam-line); }
+.blk .etag, .etag { display: inline-block; width: auto; font: 700 9.5px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; background: var(--exam-line); color: #fff; border-radius: 3px; padding: 2px 4px; margin-right: 4px; vertical-align: 1px; }
+.btn.exam { border-color: var(--exam-line); color: var(--exam-ink); background: var(--exam-bg); font-weight: 600; }
+.btn.exam:hover { filter: brightness(.97); }
+.examsw { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 10px; padding: 10px 12px; text-align: left; }
+.examsw .knob { flex: none; width: 40px; height: 24px; border-radius: 99px; background: var(--line-strong); position: relative; transition: background .15s; }
+.examsw .knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.examsw[aria-pressed="true"] { border-color: var(--exam-line); background: var(--exam-bg); color: var(--exam-ink); }
+.examsw[aria-pressed="true"] .knob { background: var(--exam-line); }
+.examsw[aria-pressed="true"] .knob::after { transform: translateX(16px); }
+.examsw b { display: block; }
+.examsw small { color: var(--muted); }
+.examsw[aria-pressed="true"] small { color: inherit; opacity: .8; }
+.card.isexam h2 { color: var(--exam-ink); }
 </style>
 </head>
 <body>
@@ -281,6 +301,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         <button data-v="month" aria-pressed="false">Maand</button>
       </div>
       <button class="btn primary" id="add">+ Les</button>
+      <button class="btn exam" id="addexam" type="button">+ Examen</button>
       <button class="btn ghost acct" id="cfg" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Account</button>
     </div>
   </header>
@@ -377,7 +398,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
   function srcOf(l) { return l.source === 'own' ? 'own' : 'work'; }
-  function kindOf(l) { return dur(l) < 75 ? ' enkel' : ''; }
+  function kindOf(l) { return (dur(l) < 75 ? ' enkel' : '') + (l.exam ? ' exam' : ''); }
   function priceList(src) { return src === 'own' ? cfg.ownPrices : cfg.workPrices; }
   function defaultPrice(src) {
     var list = priceList(src);
@@ -433,7 +454,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     $('sum').replaceChildren(
       h('div', { class: 'f' }, h('span', { class: 'lbl' }, 'Uren'), h('span', { class: 'val' }, fmtH(s.min)), h('span', { class: 'hint' }, '(' + s.min + ' min)')),
       h('div', { class: 'f' }, h('span', { class: 'lbl' }, 'Lessen'), h('span', { class: 'val' }, String(s.n)),
-        h('span', { class: 'hint' }, list.filter(function (l) { return dur(l) === 2 * UNIT; }).length + ' blokuur · ' + list.filter(function (l) { return dur(l) === UNIT; }).length + ' enkel')),
+        h('span', { class: 'hint' }, list.filter(function (l) { return dur(l) === 2 * UNIT; }).length + ' blokuur · ' + list.filter(function (l) { return dur(l) === UNIT; }).length + ' enkel' + (function () { var x = list.filter(function (l) { return l.exam; }).length; return x ? ' · ' + x + (x === 1 ? ' examen' : ' examens') : ''; })())),
       h('div', { class: 'f' }, h('span', { class: 'lbl' }, 'Verdiend'), h('span', { class: 'val' }, eur(s.total))),
       h('div', { class: 'split' },
         h('span', null, h('i', { class: 'dot work' }), cfg.workName + ' ' + eur(s.work)),
@@ -493,10 +514,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
           var top = (e.s - START_H * 60) * HPX / 60, ht = Math.max(18, (toMin(l.end) - e.s) * HPX / 60 - 1);
           var info = l.start + '–' + l.end + ' · ' + eur(priceOf(l));
           var tags = (l.tags || []).length ? ' · ' + l.tags.join(' ') : '';
-          col.append(h('button', { class: 'blk ' + src + kindOf(l), title: l.name + ' ' + info,
+          col.append(h('button', { class: 'blk ' + src + kindOf(l), title: (l.exam ? 'Examen: ' : '') + l.name + ' ' + info,
             style: 'top:' + top + 'px;height:' + ht + 'px;left:calc(' + (e.lane / e.n * 100) + '% + 2px);width:calc(' + (100 / e.n) + '% - 4px)',
             onclick: function () { openLesson(l); } },
-            h('b', null, l.name), ht >= 34 ? h('span', null, info + tags) : null));
+            h('b', null, l.exam ? h('span', { class: 'etag' }, 'Examen') : null, l.name), ht >= 34 ? h('span', null, info + tags) : null));
         });
         if (d === today) {
           var nm = nowMin();
@@ -522,7 +543,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         cells.push(h('button', { class: 'mc' + (out ? ' out' : '') + (d === today ? ' today' : ''), onclick: function () { cursor = d; view = 'day'; render(); } },
           h('div', { class: 'top' }, h('span', { class: 'd' }, String(dnum(d))), list.length ? h('span', { class: 'hrs' }, fmtHM(s.min)) : null),
           h('div', { class: 'pills' },
-            list.slice(0, 3).map(function (l) { return h('span', { class: 'pill ' + srcOf(l) + kindOf(l) }, l.start + ' ' + l.name); })),
+            list.slice(0, 3).map(function (l) { return h('span', { class: 'pill ' + srcOf(l) + kindOf(l) }, l.start + ' ' + (l.exam ? 'Examen ' : '') + l.name); })),
           list.length > 3 ? h('span', { class: 'more' }, '+' + (list.length - 3) + ' meer') : null));
       })(addDays(start, i));
     }
@@ -576,7 +597,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function renderLegend() {
     $('legend').replaceChildren(
       h('span', null, h('i', { class: 'sw work' }), cfg.workName + ' blokuur'), h('span', null, h('i', { class: 'sw work enkel' }), cfg.workName + ' enkel uur'),
-      h('span', null, h('i', { class: 'sw own' }), cfg.ownName + ' blokuur'), h('span', null, h('i', { class: 'sw own enkel' }), cfg.ownName + ' enkel uur'));
+      h('span', null, h('i', { class: 'sw own' }), cfg.ownName + ' blokuur'), h('span', null, h('i', { class: 'sw own enkel' }), cfg.ownName + ' enkel uur'), h('span', null, h('i', { class: 'sw exam' }), 'Examen'));
   }
   function render() {
     title();
@@ -591,17 +612,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   }
 
   /* ---------- les maken en wijzigen ---------- */
-  function openLesson(lesson, date, startMin) {
+  function openLesson(lesson, date, startMin, exam) {
     confirmDel = false; formErr = '';
     if (lesson) {
       draft = { id: lesson.id, date: lesson.date, start: lesson.start, end: lesson.end, name: lesson.name || '',
-        tags: (lesson.tags || []).join(', '), source: srcOf(lesson), unitPrice: unitOf(lesson), unitMin: lessonUnit(lesson), durTouched: true };
+        tags: (lesson.tags || []).join(', '), source: srcOf(lesson), unitPrice: unitOf(lesson), unitMin: lessonUnit(lesson), exam: !!lesson.exam, durTouched: true };
     } else {
       var src = store('rp-source') === 'own' ? 'own' : 'work';
       var st = startMin;
       if (st == null) { var day = lessonsOn(date), last = day[day.length - 1]; st = last ? toMin(last.end) : 9 * 60; }
       draft = { id: null, date: date, start: toTime(st), end: toTime(st + (src === 'own' ? UNIT : 2 * UNIT)), name: '', tags: '',
-        source: src, unitPrice: defaultPrice(src), unitMin: unitMin(src), durTouched: false };
+        source: src, unitPrice: defaultPrice(src), unitMin: unitMin(src), exam: !!exam, durTouched: false };
     }
     buildModal();
     var nm = $('m-name'); if (nm) nm.focus();
@@ -643,10 +664,16 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     $('m-so').setAttribute('aria-pressed', src === 'own' ? 'true' : 'false');
     refreshChips();
   }
+  function modalTitle(isNew) { return draft.exam ? (isNew ? 'Nieuw examen' : 'Examen wijzigen') : (isNew ? 'Nieuwe les' : 'Les wijzigen'); }
   function buildModal() {
     var isNew = !draft.id;
-    var form = h('form', { class: 'card', onsubmit: function (e) { e.preventDefault(); if (!saving) saveLesson(); } },
-      h('h2', null, isNew ? 'Nieuwe les' : 'Les wijzigen'),
+    var form = h('form', { class: 'card' + (draft.exam ? ' isexam' : ''), onsubmit: function (e) { e.preventDefault(); if (!saving) saveLesson(); } },
+      h('h2', { id: 'm-title' }, modalTitle(isNew)),
+      h('button', { type: 'button', class: 'examsw', id: 'm-exam', 'aria-pressed': draft.exam ? 'true' : 'false', onclick: function () {
+        draft.exam = !draft.exam;
+        this.setAttribute('aria-pressed', draft.exam ? 'true' : 'false');
+        form.classList.toggle('isexam', draft.exam); $('m-title').textContent = modalTitle(isNew); } },
+        h('span', null, h('b', null, 'Examen'), h('small', null, 'Krijgt een eigen paarse kleur in je agenda')), h('span', { class: 'knob', 'aria-hidden': 'true' })),
       h('div', { class: 'fld' }, h('label', { for: 'm-name' }, 'Leerling'),
         h('input', { type: 'text', id: 'm-name', autocomplete: 'off', placeholder: 'Naam', value: draft.name, oninput: function (e) { draft.name = e.target.value; } })),
       h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Rijschool'),
@@ -685,7 +712,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) return 'Kies een datum.';
     if (typeof draft.unitPrice !== 'number' || isNaN(draft.unitPrice) || draft.unitPrice < 0) return 'Vul een prijs in.';
     return { date: draft.date, start: draft.start, end: draft.end, name: name, source: draft.source, unitPrice: draft.unitPrice, unitMin: draft.unitMin,
-      tags: draft.tags.split(',').map(function (t) { return t.trim(); }).filter(Boolean) };
+      tags: draft.tags.split(',').map(function (t) { return t.trim(); }).filter(Boolean), exam: !!draft.exam };
   }
   function newId() { return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   async function saveLesson() {
@@ -702,7 +729,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   async function copyNextWeek() {
     var b = bodyFromDraft();
     if (typeof b === 'string') { $('m-err').textContent = b; return; }
-    b.date = addDays(b.date, 7);
+    b.date = addDays(b.date, 7); b.exam = false;
     try { await db.put(newId(), b); toast('Gekopieerd naar ' + shortDate(b.date)); }
     catch (err) { $('m-err').textContent = 'Kopiëren lukt niet. Probeer het zo nog eens.'; }
   }
@@ -728,13 +755,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var d = view === 'month' || view === 'year' ? todayStr() : (view === 'week' ? (function () { var t = todayStr(), m = mondayOf(cursor); return t >= m && t <= addDays(m, 6) ? t : cursor; })() : cursor);
     openLesson(null, d);
   });
+  $('addexam').addEventListener('click', function () {
+    var d = view === 'month' || view === 'year' ? todayStr() : (view === 'week' ? (function () { var t = todayStr(), m = mondayOf(cursor); return t >= m && t <= addDays(m, 6) ? t : cursor; })() : cursor);
+    openLesson(null, d, null, true);
+  });
   $('cfg').addEventListener('click', function () { openAccount(false); });
   $('ov').addEventListener('mousedown', function (e) { if (e.target === $('ov')) closeModal(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('ov').hidden) closeModal(); });
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '3 · 29 okt 2026';
+  var BUILD = '4 · 29 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
@@ -749,7 +780,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function localCount() { var m = readLocal(); return m ? Object.keys(m.lessons).length : 0; }
   function cleanLesson(b) {
     var o = {};
-    ['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags'].forEach(function (k) { if (b && b[k] !== undefined) o[k] = b[k]; });
+    ['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags', 'exam'].forEach(function (k) { if (b && b[k] !== undefined) o[k] = b[k]; });
     return o;
   }
 
@@ -1015,13 +1046,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function buildExcel(from, to) {
     var list = lessonsBetween(from, to);
     var DAYS = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
-    var head = ['Datum', 'Dag', 'Van', 'Tot', 'Leerling', 'Rijschool', 'Soort', 'Minuten', 'Uren', 'Tarief', 'Tarief per', 'Bedrag', 'Labels']
+    var head = ['Datum', 'Dag', 'Van', 'Tot', 'Leerling', 'Rijschool', 'Soort', 'Minuten', 'Uren', 'Tarief', 'Tarief per', 'Bedrag', 'Labels', 'Examen']
       .map(function (t) { return { v: t, s: ST.head }; });
     var rows = [head];
     list.forEach(function (l) {
       rows.push([{ v: excelDate(l.date), s: ST.date }, DAYS[(parseYmd(l.date).getUTCDay() + 6) % 7], l.start, l.end, l.name || '',
         srcOf(l) === 'own' ? cfg.ownName : cfg.workName, kindName(l), { v: dur(l), s: ST.num }, fmtH(dur(l)),
-        { v: round2(unitOf(l)), s: ST.eur }, lessonUnit(l) + ' min', { v: round2(priceOf(l)), s: ST.eur }, (l.tags || []).join(', ')]);
+        { v: round2(unitOf(l)), s: ST.eur }, lessonUnit(l) + ' min', { v: round2(priceOf(l)), s: ST.eur }, (l.tags || []).join(', '), l.exam ? 'Ja' : '']);
     });
     var n = list.length, last = n + 1, s = sums(list);
     rows.push(null);
@@ -1035,14 +1066,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         { f: 'SUMIF(F2:F' + last + ',"' + p[1].replace(/"/g, '""') + '",L2:L' + last + ')', v: round2(sub[p[0]]), s: ST.eur }]);
     });
     /* tweede blad: per maand */
-    var mrows = [['Maand', 'Lessen', 'Blokuur', 'Enkel uur', 'Minuten', 'Uren', cfg.workName, cfg.ownName, 'Totaal'].map(function (t) { return { v: t, s: ST.head }; })];
+    var mrows = [['Maand', 'Lessen', 'Blokuur', 'Enkel uur', 'Minuten', 'Uren', cfg.workName, cfg.ownName, 'Totaal', 'Examens'].map(function (t) { return { v: t, s: ST.head }; })];
     var m = from.slice(0, 7) + '-01';
     while (m <= to) {
       var lo = m < from ? from : m, end = addDays(addMonths(m, 1), -1), hi = end > to ? to : end;
       var ml = lessonsBetween(lo, hi), ms = sums(ml);
       mrows.push([MON_LONG[parseYmd(m).getUTCMonth()] + ' ' + parseYmd(m).getUTCFullYear(), { v: ms.n, s: ST.num },
         { v: ml.filter(function (l) { return dur(l) === 2 * UNIT; }).length, s: ST.num }, { v: ml.filter(function (l) { return dur(l) === UNIT; }).length, s: ST.num },
-        { v: ms.min, s: ST.num }, fmtH(ms.min), { v: round2(ms.work), s: ST.eur }, { v: round2(ms.own), s: ST.eur }, { v: round2(ms.total), s: ST.eur }]);
+        { v: ms.min, s: ST.num }, fmtH(ms.min), { v: round2(ms.work), s: ST.eur }, { v: round2(ms.own), s: ST.eur }, { v: round2(ms.total), s: ST.eur }, { v: ml.filter(function (l) { return l.exam; }).length, s: ST.num }]);
       m = addMonths(m, 1);
     }
     var ml2 = mrows.length;
@@ -1051,10 +1082,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       return { f: 'SUM(' + c + '2:' + c + ml2 + ')', v: [s.n, list.filter(function (l) { return dur(l) === 2 * UNIT; }).length, list.filter(function (l) { return dur(l) === UNIT; }).length, s.min][i], s: ST.bnum };
     }), [{ v: fmtH(s.min), s: ST.bold }], ['G', 'H', 'I'].map(function (c, i) {
       return { f: 'SUM(' + c + '2:' + c + ml2 + ')', v: round2([s.work, s.own, s.total][i]), s: ST.beur };
-    })));
+    }), [{ f: 'SUM(J2:J' + ml2 + ')', v: list.filter(function (l) { return l.exam; }).length, s: ST.bnum }]));
     return workbook([
-      { name: 'Lessen', rows: rows, widths: [12, 11, 7, 7, 22, 16, 11, 9, 8, 10, 10, 11, 18], freeze: true },
-      { name: 'Per maand', rows: mrows, widths: [18, 8, 9, 10, 9, 8, 13, 13, 13], freeze: true }
+      { name: 'Lessen', rows: rows, widths: [12, 11, 7, 7, 22, 16, 11, 9, 8, 10, 10, 11, 18, 9], freeze: true },
+      { name: 'Per maand', rows: mrows, widths: [18, 8, 9, 10, 9, 8, 13, 13, 13, 9], freeze: true }
     ]);
   }
   function exportName(from, to) {
