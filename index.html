@@ -266,6 +266,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .school .sh { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .row2 { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
 .row2.dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.prices { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pitem { display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 99px; background: var(--bg); padding: 0 4px 0 12px; }
+.pitem .cur { color: var(--muted); }
+.fld .pitem input[type="text"] { width: 4.2rem; border: 0; border-radius: 0; background: transparent; padding: 8px 4px; font-size: 16px; }
+.pitem input:focus-visible { outline: none; }
+.pitem:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.pdel { border: 0; background: transparent; color: var(--muted); font-size: 18px; line-height: 1; width: 28px; height: 28px; border-radius: 50%; }
+.pdel:hover { background: var(--accent-soft); color: var(--danger); }
+.padd { color: var(--accent); font-weight: 600; }
 .acct { display: inline-flex; align-items: center; gap: 6px; }
 .acct svg { width: 16px; height: 16px; }
 @media (max-width: 640px) { .card input[type="text"], .card input[type="number"], .card input[type="time"], .card input[type="date"] { font-size: 16px; } }
@@ -803,7 +812,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '6 · 29 okt 2026';
+  var BUILD = '7 · 29 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
@@ -940,17 +949,32 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       });
       return h('div', { class: 'fld' }, h('span', { class: 'l' }, label), h('div', { class: 'seg', role: 'group', 'aria-label': label }, bs));
     }
+    /* Elke prijs een eigen vakje: geen komma's of spaties nodig op het cijfertoetsenbord */
+    function priceEditor(k, list) {
+      var box = h('div', { class: 'prices', id: 's-' + k + 'p' });
+      function item(v) {
+        var row = h('span', { class: 'pitem' },
+          h('span', { class: 'cur', 'aria-hidden': 'true' }, '€'),
+          h('input', { type: 'text', inputmode: 'decimal', autocomplete: 'off', 'aria-label': 'Prijs in euro', value: v == null ? '' : fmtNum(v) }),
+          h('button', { type: 'button', class: 'pdel', 'aria-label': 'Prijs verwijderen', onclick: function () {
+            if (box.querySelectorAll('.pitem').length > 1) row.remove(); else row.querySelector('input').value = ''; } }, '×'));
+        return row;
+      }
+      var add = h('button', { type: 'button', class: 'chip padd', onclick: function () {
+        if (box.querySelectorAll('.pitem').length >= 6) return;
+        var r = item(null); box.insertBefore(r, add); r.querySelector('input').focus(); } }, '+ Prijs');
+      (list.length ? list : [null]).forEach(function (v) { box.append(item(v)); });
+      box.append(add);
+      return h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Prijzen'), box);
+    }
     function school(k, color, title) {
       var src = k === 'w' ? 'work' : 'own';
       return h('div', { class: 'school' },
         h('div', { class: 'sh' }, h('i', { class: 'sw ' + src }), title),
         h('div', { class: 'fld' }, h('label', { for: 's-' + k + 'n' }, 'Naam'),
           h('input', { type: 'text', id: 's-' + k + 'n', autocomplete: 'off', maxlength: '30', value: src === 'work' ? cfg.workName : cfg.ownName })),
-        h('div', { class: 'row2' },
-          h('div', { class: 'fld' }, h('label', { for: 's-' + k + 'p' }, 'Prijs in euro'),
-            h('input', { type: 'text', id: 's-' + k + 'p', inputmode: 'decimal', autocomplete: 'off', placeholder: '40, 50',
-              value: (src === 'work' ? cfg.workPrices : cfg.ownPrices).map(fmtNum).join(', ') })),
-          unitSeg(src === 'work' ? 'workUnit' : 'ownUnit', 'Per')));
+        priceEditor(k, src === 'work' ? cfg.workPrices : cfg.ownPrices),
+        unitSeg(src === 'work' ? 'workUnit' : 'ownUnit', 'Prijs geldt per'));
     }
     var n = localCount(), canMove = user && n && !store('rp-moved-' + user.uid);
     var card = h('form', { class: 'card', onsubmit: function (e) { e.preventDefault(); saveSettings(f, welcome); } },
@@ -961,7 +985,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       h('h3', null, 'Rijscholen en prijzen'),
       school('w', 'work', 'Blauwe lessen'),
       school('o', 'own', 'Oranje lessen'),
-      h('p', { class: 'hint' }, 'Meerdere prijzen? Zet er een komma met een spatie tussen, bijvoorbeeld 40, 50. Lessen die al in je agenda staan houden hun eigen prijs.'),
+      h('p', { class: 'hint' }, 'Tik op + Prijs om een bedrag toe te voegen. Lessen die al in je agenda staan houden hun eigen prijs.'),
       h('div', { class: 'err', id: 's-err', role: 'alert' }),
       h('div', { class: 'acts' },
         h('button', { class: 'btn primary', type: 'submit' }, welcome ? 'Klaar' : 'Opslaan'),
@@ -975,7 +999,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   }
   function saveSettings(f, welcome) {
     var wn = $('s-wn').value.trim(), on = $('s-on').value.trim(), err = $('s-err');
-    var wp = prices($('s-wp').value, []), op = prices($('s-op').value, []);
+    function collect(id) {
+      var out = [];
+      $(id).querySelectorAll('input').forEach(function (i) { var v = parseFloat(i.value.trim().replace(',', '.')); if (!isNaN(v) && v >= 0 && out.indexOf(v) === -1) out.push(v); });
+      return out;
+    }
+    var wp = collect('s-wp'), op = collect('s-op');
     if (!wn || !on) { err.textContent = 'Vul bij allebei een naam in.'; return; }
     if (!wp.length || !op.length) { err.textContent = 'Vul bij allebei een prijs in.'; return; }
     var st = normSettings({ workName: wn, ownName: on, workPrices: wp, ownPrices: op, workUnit: f.workUnit, ownUnit: f.ownUnit }, cfg);
