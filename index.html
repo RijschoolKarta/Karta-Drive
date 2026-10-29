@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Karta Drive</title>
+<title>Karta DrivePlan</title>
 <meta name="theme-color" content="#0B5CAD">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Karta Drive">
+<meta name="apple-mobile-web-app-title" content="Karta DrivePlan">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -978,7 +978,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     }
     var n = localCount(), canMove = user && n && !store('rp-moved-' + user.uid);
     var card = h('form', { class: 'card', onsubmit: function (e) { e.preventDefault(); saveSettings(f, welcome); } },
-      h('h2', null, welcome ? 'Welkom bij Karta Drive' : 'Account'),
+      h('h2', null, welcome ? 'Welkom bij Karta DrivePlan' : 'Account'),
       welcome ? h('p', null, 'Vul de namen van je twee rijscholen (of werkgever en eigen leerlingen) en je prijzen in. Je kunt dit later altijd aanpassen via Account.') : null,
       user ? h('div', { class: 'who' }, h('span', { class: 'hint' }, 'Ingelogd als'), h('b', null, user.email || '')) :
         h('p', { class: 'hint' }, 'Je lessen staan op dit toestel.'),
@@ -1157,9 +1157,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   }
   function exportName(from, to) {
     var a = parseYmd(from), b = parseYmd(to), last = addDays(addMonths(from, 1), -1);
-    if (from.slice(8) === '01' && to === last) return 'Karta Drive ' + MON_LONG[a.getUTCMonth()] + ' ' + a.getUTCFullYear() + '.xlsx';
-    if (from.slice(5) === '01-01' && to.slice(5) === '12-31' && from.slice(0, 4) === to.slice(0, 4)) return 'Karta Drive ' + from.slice(0, 4) + '.xlsx';
-    return 'Karta Drive ' + shortDate(from) + ' ' + a.getUTCFullYear() + ' - ' + shortDate(to) + ' ' + b.getUTCFullYear() + '.xlsx';
+    if (from.slice(8) === '01' && to === last) return 'Karta DrivePlan ' + MON_LONG[a.getUTCMonth()] + ' ' + a.getUTCFullYear() + '.xlsx';
+    if (from.slice(5) === '01-01' && to.slice(5) === '12-31' && from.slice(0, 4) === to.slice(0, 4)) return 'Karta DrivePlan ' + from.slice(0, 4) + '.xlsx';
+    return 'Karta DrivePlan ' + shortDate(from) + ' ' + a.getUTCFullYear() + ' - ' + shortDate(to) + ' ' + b.getUTCFullYear() + '.xlsx';
   }
   function downloadExcel(from, to) {
     var blob = buildExcel(from, to), a = document.createElement('a');
@@ -1235,7 +1235,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     }
     $('gate').replaceChildren(h('form', { class: 'gcard', novalidate: true, onsubmit: doAuth },
       h('img', { src: 'icon-192.png', alt: '', class: 'glogo', width: '60', height: '60' }),
-      h('h1', null, 'Karta Drive'),
+      h('h1', null, 'Karta DrivePlan'),
       h('p', { class: 'hint' }, up ? 'Maak een eigen account. Je lessen worden veilig online bewaard en je ziet ze op al je apparaten.' :
         'Log in om je agenda te zien.'),
       h('div', { class: 'seg gseg', role: 'group', 'aria-label': 'Inloggen of account maken' }, tab('in', 'Inloggen'), tab('up', 'Account maken')),
@@ -1330,7 +1330,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     if (!CLOUD_WANTED) { start(localDb()); return; }
     if (!CLOUD) {
       /* De inlogcode kon niet geladen worden: meestal geen internet bij de allereerste keer openen */
-      problem = 'Geen internetverbinding. Verbind met internet en open Karta Drive opnieuw.';
+      problem = 'Geen internetverbinding. Verbind met internet en open Karta DrivePlan opnieuw.';
       $('gate').hidden = true; render(); return;
     }
     $('app').hidden = true; $('gate').hidden = false;

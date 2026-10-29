@@ -1,4 +1,4 @@
-# Karta Drive
+# Karta DrivePlan
 De planner voor rijinstructeurs: rijlessen, uren en inkomsten op één plek. Iedereen logt in met een eigen account en ziet alleen zijn eigen lessen, op al zijn apparaten.
 
 ## Koppelen aan Firebase (eenmalig)
