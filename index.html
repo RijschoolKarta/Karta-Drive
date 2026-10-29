@@ -12,6 +12,10 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png" type="image/png">
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap">
 <style>
 /* Layout: agenda-app. Kop met maand, navigatie en Dag/Week/Maand; daaronder een samenvatting van de gekozen periode; daaronder het rooster waar je op een tijdstip klikt om een les te maken. */
@@ -236,10 +240,35 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   .wkmin { text-align: left; }
 }
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Inloggen en account */
+.gate { position: fixed; inset: 0; z-index: 40; background: var(--bg); overflow: auto; display: grid; place-items: center;
+  padding: max(24px, env(safe-area-inset-top, 0px)) 16px max(24px, env(safe-area-inset-bottom, 0px)); }
+.gcard { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; }
+.glogo { width: 60px; height: 60px; border-radius: 14px; display: block; }
+.gcard h1 { font: 700 34px/1 var(--font-display); margin: 0; }
+.gcard p { margin: 0; }
+.gseg { display: grid; grid-template-columns: 1fr 1fr; }
+.gseg button { padding: 9px 12px; }
+.fld input[type="email"], .fld input[type="password"] { width: 100%; padding: 11px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); font-size: 16px; }
+.btn.big { padding: 12px 16px; font-size: 16px; }
+.btn:disabled { opacity: .6; cursor: default; }
+.linkbtn { border: 0; background: none; color: var(--accent); padding: 4px 0; align-self: center; font-size: 14px; }
+.linkbtn:hover { text-decoration: underline; }
+.ok { font-size: 14px; background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; }
+.card h3 { font: 600 11px/1 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 4px 0 0; }
+.card p { margin: 0; }
+.who { display: flex; flex-direction: column; gap: 3px; background: var(--bg); border-radius: 10px; padding: 10px 12px; overflow-wrap: anywhere; }
+.school { display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.school .sh { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.row2 { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+.acct { display: inline-flex; align-items: center; gap: 6px; }
+.acct svg { width: 16px; height: 16px; }
+@media (max-width: 640px) { .card input[type="text"], .card input[type="number"], .card input[type="time"], .card input[type="date"] { font-size: 16px; } }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="app">
   <header class="bar">
     <div class="title"><h1><button class="ttlbtn" id="ttlbtn" aria-haspopup="dialog" aria-expanded="false"><span id="ttl"></span> <span class="car" aria-hidden="true">▾</span></button></h1><small id="sub"></small><div class="pick" id="pick" role="dialog" aria-label="Datum kiezen" hidden></div></div>
     <div class="tools">
@@ -251,16 +280,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         <button data-v="month" aria-pressed="false">Maand</button>
       </div>
       <button class="btn primary" id="add">+ Les</button>
-      <button class="btn ghost" id="cfg" aria-label="Back-up">Back-up</button>
+      <button class="btn ghost acct" id="cfg" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Account</button>
     </div>
   </header>
   <section class="sum" id="sum" aria-label="Samenvatting"></section>
   <div class="legend" id="legend" aria-label="Kleuren">
-    <span><i class="sw work"></i>Ruzgar blokuur</span><span><i class="sw work enkel"></i>Ruzgar enkel uur</span>
-    <span><i class="sw own"></i>Karta blokuur</span><span><i class="sw own enkel"></i>Karta enkel uur</span>
   </div>
   <section class="cal" id="cal"><div class="status">Lessen laden…</div></section>
 </div>
+<div class="gate" id="gate" hidden></div>
 <div class="ov" id="ov" hidden></div>
 <div class="toast" id="toast" hidden></div>
 
@@ -321,7 +349,26 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   }
 
   var db = null, lessons = [], loaded = false, problem = '';
-  var cfg = { rateWork: 25, ownPrices: [40, 50], workName: 'Ruzgar', ownName: 'Karta' };
+  /* Instellingen per account: namen van de twee rijscholen, prijzen en per hoeveel minuten die prijs geldt */
+  var DEFAULTS_LOCAL = { workName: 'Ruzgar', ownName: 'Karta', workPrices: [25], ownPrices: [40, 50], workUnit: 60, ownUnit: 50 };
+  var DEFAULTS_NEW = { workName: 'Rijschool', ownName: 'Eigen leerlingen', workPrices: [25], ownPrices: [40, 50], workUnit: 60, ownUnit: 50 };
+  function prices(v, fb) {
+    var a = Array.isArray(v) ? v : String(v == null ? '' : v).split(/\s*[;\/]\s*|,\s+|\s+/);
+    a = a.map(function (x) { return parseFloat(String(x).replace(',', '.')); }).filter(function (x) { return !isNaN(x) && x >= 0; });
+    return a.length ? a.slice(0, 6) : fb.slice();
+  }
+  function normSettings(s, base) {
+    s = s || {};
+    function u(v, d) { return v === 50 || v === 60 ? v : d; }
+    return {
+      workName: String(s.workName || base.workName).trim().slice(0, 30) || base.workName,
+      ownName: String(s.ownName || base.ownName).trim().slice(0, 30) || base.ownName,
+      workPrices: prices(s.workPrices != null ? s.workPrices : s.rate, base.workPrices),
+      ownPrices: prices(s.ownPrices, base.ownPrices),
+      workUnit: u(s.workUnit, base.workUnit), ownUnit: u(s.ownUnit, base.ownUnit)
+    };
+  }
+  var cfg = normSettings(null, DEFAULTS_LOCAL);
   var narrow = window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
   var view = narrow ? 'day' : 'week';
   var cursor = todayStr();
@@ -330,15 +377,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
   function srcOf(l) { return l.source === 'own' ? 'own' : 'work'; }
   function kindOf(l) { return dur(l) < 75 ? ' enkel' : ''; }
+  function priceList(src) { return src === 'own' ? cfg.ownPrices : cfg.workPrices; }
   function defaultPrice(src) {
-    if (src === 'work') return cfg.rateWork;
-    var last = parseFloat(store('rp-own-price'));
-    return !isNaN(last) ? last : cfg.ownPrices[cfg.ownPrices.length - 1];
+    var list = priceList(src);
+    var last = parseFloat(store('rp-price-' + src) || (src === 'own' ? store('rp-own-price') : ''));
+    return !isNaN(last) && list.indexOf(last) !== -1 ? last : (src === 'own' ? list[list.length - 1] : list[0]);
   }
-  function unitOf(l) { return typeof l.unitPrice === 'number' ? l.unitPrice : (srcOf(l) === 'own' ? defaultPrice('own') : cfg.rateWork); }
-  /* Ruzgar betaalt per 60 minuten, Karta (eigen leerlingen) per 50 minuten */
-  function unitMin(src) { return src === 'own' ? 50 : 60; }
-  function priceOf(l) { return unitOf(l) * dur(l) / unitMin(srcOf(l)); }
+  function unitOf(l) { return typeof l.unitPrice === 'number' ? l.unitPrice : defaultPrice(srcOf(l)); }
+  /* De prijs geldt per 50 of per 60 minuten (in te stellen per rijschool); elke les onthoudt waarmee hij is opgeslagen */
+  function unitMin(src) { return src === 'own' ? cfg.ownUnit : cfg.workUnit; }
+  function lessonUnit(l) { return l.unitMin === 50 || l.unitMin === 60 ? l.unitMin : unitMin(srcOf(l)); }
+  function priceOf(l) { return unitOf(l) * dur(l) / lessonUnit(l); }
   function lessonsOn(d) {
     return lessons.filter(function (l) { return l.date === d; }).sort(function (a, b) { return toMin(a.start) - toMin(b.start); });
   }
@@ -523,13 +572,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     scrolled = false;
   }
 
+  function renderLegend() {
+    $('legend').replaceChildren(
+      h('span', null, h('i', { class: 'sw work' }), cfg.workName + ' blokuur'), h('span', null, h('i', { class: 'sw work enkel' }), cfg.workName + ' enkel uur'),
+      h('span', null, h('i', { class: 'sw own' }), cfg.ownName + ' blokuur'), h('span', null, h('i', { class: 'sw own enkel' }), cfg.ownName + ' enkel uur'));
+  }
   function render() {
     title();
     Array.prototype.forEach.call($('views').children, function (b) { b.setAttribute('aria-pressed', b.dataset.v === view ? 'true' : 'false'); });
     $('home').setAttribute('aria-pressed', view === 'year' ? 'true' : 'false');
     $('legend').hidden = view === 'year';
     if (problem) { $('sum').replaceChildren(); $('cal').replaceChildren(h('div', { class: 'status' }, problem)); return; }
-    if (!loaded) { $('sum').replaceChildren(); return; }
+    renderLegend();
+    if (!loaded) { $('sum').replaceChildren(); $('cal').replaceChildren(h('div', { class: 'status' }, 'Lessen laden…')); return; }
     renderSummary();
     if (view === 'year') renderYear(); else if (view === 'month') renderMonth(); else renderGrid();
   }
@@ -539,13 +594,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     confirmDel = false; formErr = '';
     if (lesson) {
       draft = { id: lesson.id, date: lesson.date, start: lesson.start, end: lesson.end, name: lesson.name || '',
-        tags: (lesson.tags || []).join(', '), source: srcOf(lesson), unitPrice: unitOf(lesson), durTouched: true };
+        tags: (lesson.tags || []).join(', '), source: srcOf(lesson), unitPrice: unitOf(lesson), unitMin: lessonUnit(lesson), durTouched: true };
     } else {
       var src = store('rp-source') === 'own' ? 'own' : 'work';
       var st = startMin;
       if (st == null) { var day = lessonsOn(date), last = day[day.length - 1]; st = last ? toMin(last.end) : 9 * 60; }
       draft = { id: null, date: date, start: toTime(st), end: toTime(st + (src === 'own' ? UNIT : 2 * UNIT)), name: '', tags: '',
-        source: src, unitPrice: defaultPrice(src), durTouched: false };
+        source: src, unitPrice: defaultPrice(src), unitMin: unitMin(src), durTouched: false };
     }
     buildModal();
     var nm = $('m-name'); if (nm) nm.focus();
@@ -559,29 +614,29 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function refreshChips() {
     var dc = $('m-dur'), pc = $('m-price');
     if (!dc || !pc) return;
-    $('m-plbl').textContent = 'Prijs per ' + unitMin(draft.source) + ' minuten';
+    $('m-plbl').textContent = 'Prijs per ' + draft.unitMin + ' minuten';
     var d = curDur();
     dc.replaceChildren.apply(dc, [50, 100].map(function (m) {
       return h('button', { type: 'button', class: 'chip', 'aria-pressed': d === m ? 'true' : 'false', onclick: function () {
         draft.durTouched = true; draft.end = toTime(toMin(draft.start) + m); $('m-end').value = draft.end; refreshChips(); } }, (m === 50 ? 'Enkel uur' : 'Blokuur') + ' · ' + m + ' min');
     }));
-    var opts = draft.source === 'work' ? [cfg.rateWork] : cfg.ownPrices;
+    var opts = priceList(draft.source);
     var inOpts = opts.indexOf(draft.unitPrice) !== -1;
     pc.replaceChildren.apply(pc, opts.map(function (p) {
       return h('button', { type: 'button', class: 'chip', 'aria-pressed': draft.unitPrice === p ? 'true' : 'false', onclick: function () {
         draft.unitPrice = p; refreshChips(); } }, eur(p));
-    }).concat([h('input', { type: 'number', id: 'm-custom', step: '0.5', min: '0', placeholder: 'Anders', 'aria-label': 'Eigen prijs per ' + unitMin(draft.source) + ' minuten',
+    }).concat([h('input', { type: 'number', id: 'm-custom', step: '0.5', min: '0', placeholder: 'Anders', 'aria-label': 'Eigen prijs per ' + draft.unitMin + ' minuten',
       value: inOpts ? '' : String(draft.unitPrice), oninput: function (e) {
         var v = parseFloat(e.target.value); if (!isNaN(v)) { draft.unitPrice = v; updateTotal(); } } })]));
     updateTotal();
   }
   function updateTotal() {
     var t = $('m-total'); if (!t) return;
-    t.textContent = eur(draft.unitPrice * curDur() / unitMin(draft.source));
+    t.textContent = eur(draft.unitPrice * curDur() / draft.unitMin);
     var ds = $('m-dsum'); if (ds) ds.textContent = fmtDur(curDur());
   }
   function setSource(src) {
-    draft.source = src; draft.unitPrice = defaultPrice(src);
+    draft.source = src; draft.unitPrice = defaultPrice(src); draft.unitMin = unitMin(src);
     if (!draft.id && !draft.durTouched) { draft.end = toTime(toMin(draft.start) + (src === 'own' ? UNIT : 2 * UNIT)); $('m-end').value = draft.end; }
     $('m-sw').setAttribute('aria-pressed', src === 'work' ? 'true' : 'false');
     $('m-so').setAttribute('aria-pressed', src === 'own' ? 'true' : 'false');
@@ -608,7 +663,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         h('div', { class: 'fld' }, h('label', { for: 'm-end' }, 'Tot'),
           h('input', { type: 'time', id: 'm-end', value: draft.end, oninput: function (e) { draft.durTouched = true; draft.end = e.target.value; refreshChips(); } }))),
       h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Duur'), h('div', { class: 'chips', id: 'm-dur' })),
-      h('div', { class: 'fld' }, h('span', { class: 'l', id: 'm-plbl' }, 'Prijs per ' + unitMin(draft.source) + ' minuten'), h('div', { class: 'chips', id: 'm-price' })),
+      h('div', { class: 'fld' }, h('span', { class: 'l', id: 'm-plbl' }, 'Prijs per ' + draft.unitMin + ' minuten'), h('div', { class: 'chips', id: 'm-price' })),
       h('div', { class: 'total' }, h('span', null, 'Totaal voor ', h('span', { id: 'm-dsum' })), h('b', { id: 'm-total' })),
       h('div', { class: 'fld' }, h('label', { for: 'm-tags' }, 'Labels (optioneel)'),
         h('input', { type: 'text', id: 'm-tags', autocomplete: 'off', placeholder: 'A, 1, PROEFLES', value: draft.tags, oninput: function (e) { draft.tags = e.target.value; } })),
@@ -628,7 +683,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     if (isNaN(s) || isNaN(e) || e <= s) return 'De eindtijd moet na de starttijd liggen.';
     if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) return 'Kies een datum.';
     if (typeof draft.unitPrice !== 'number' || isNaN(draft.unitPrice) || draft.unitPrice < 0) return 'Vul een prijs in.';
-    return { date: draft.date, start: draft.start, end: draft.end, name: name, source: draft.source, unitPrice: draft.unitPrice,
+    return { date: draft.date, start: draft.start, end: draft.end, name: name, source: draft.source, unitPrice: draft.unitPrice, unitMin: draft.unitMin,
       tags: draft.tags.split(',').map(function (t) { return t.trim(); }).filter(Boolean) };
   }
   function newId() { return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
@@ -637,8 +692,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     if (typeof b === 'string') { $('m-err').textContent = b; formErr = b; return; }
     saving = true;
     try {
-      await db.collection('lessons').doc(draft.id || newId()).set(b);
-      store('rp-source', b.source); if (b.source === 'own') store('rp-own-price', String(b.unitPrice));
+      await db.put(draft.id || newId(), b);
+      store('rp-source', b.source); store('rp-price-' + b.source, String(b.unitPrice));
       cursor = b.date; closeModal(); render();
     } catch (err) { formErr = 'Opslaan lukt niet. Probeer het zo nog eens.'; $('m-err').textContent = formErr; }
     finally { saving = false; }
@@ -647,29 +702,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var b = bodyFromDraft();
     if (typeof b === 'string') { $('m-err').textContent = b; return; }
     b.date = addDays(b.date, 7);
-    try { await db.collection('lessons').doc(newId()).set(b); toast('Gekopieerd naar ' + shortDate(b.date)); }
+    try { await db.put(newId(), b); toast('Gekopieerd naar ' + shortDate(b.date)); }
     catch (err) { $('m-err').textContent = 'Kopiëren lukt niet. Probeer het zo nog eens.'; }
   }
   async function delLesson() {
     if (!confirmDel) { confirmDel = true; $('m-del').textContent = 'Zeker weten? Verwijder'; return; }
-    try { await db.collection('lessons').doc(draft.id).delete(); closeModal(); }
+    try { await db.remove(draft.id); closeModal(); }
     catch (err) { $('m-err').textContent = 'Verwijderen lukt niet. Probeer het zo nog eens.'; }
-  }
-
-  /* ---------- back-up ---------- */
-  function openBackup() {
-    draft = { settings: true };
-    $('ov').replaceChildren(h('div', { class: 'card' },
-      h('h2', null, 'Back-up'),
-      h('p', { class: 'hint' }, 'Je lessen staan op dit toestel. Maak af en toe een back-up, dan raak je niets kwijt en kun je ze ook op een ander apparaat laden.'),
-      h('p', { class: 'hint' }, 'Versie ' + BUILD),
-      h('div', { class: 'acts' },
-        h('button', { class: 'btn primary', type: 'button', onclick: downloadBackup }, 'Back-up maken'),
-        h('button', { class: 'btn', type: 'button', onclick: function () { $('s-file').click(); } }, 'Back-up laden'),
-        h('input', { type: 'file', id: 's-file', accept: '.json,application/json', hidden: true, onchange: function (e) { loadBackup(e.target.files[0]); } })),
-      h('span', { class: 'err', id: 's-err' }),
-      h('div', { class: 'acts' }, h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten'))));
-    $('ov').hidden = false;
   }
 
   /* ---------- knoppen ---------- */
@@ -688,76 +727,295 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var d = view === 'month' || view === 'year' ? todayStr() : (view === 'week' ? (function () { var t = todayStr(), m = mondayOf(cursor); return t >= m && t <= addDays(m, 6) ? t : cursor; })() : cursor);
     openLesson(null, d);
   });
-  $('cfg').addEventListener('click', openBackup);
+  $('cfg').addEventListener('click', function () { openAccount(false); });
   $('ov').addEventListener('mousedown', function (e) { if (e.target === $('ov')) closeModal(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('ov').hidden) closeModal(); });
 
-  /* ---------- opslag in deze browser, met back-up naar een bestand ---------- */
+  /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '1 · 27 okt 2026';
-  var SEED = [];
+  var BUILD = '2 · 29 okt 2026';
+  var FB = window.KARTA_FIREBASE || null;
+  var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
+  var CLOUD = CLOUD_WANTED && !!window.firebase;
+  var user = null, settingsKnown = false, settingsExist = false, asked = false;
+
+  function readLocal() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY), m = raw ? JSON.parse(raw) : null;
+      return m && typeof m === 'object' && m.lessons && typeof m.lessons === 'object' ? m : null;
+    } catch (e) { return null; }
+  }
+  function localCount() { var m = readLocal(); return m ? Object.keys(m.lessons).length : 0; }
+  function cleanLesson(b) {
+    var o = {};
+    ['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags'].forEach(function (k) { if (b && b[k] !== undefined) o[k] = b[k]; });
+    return o;
+  }
+
   function localDb() {
-    var mem = null, subs = { lessons: [], settings: [] };
-    try { var raw = localStorage.getItem(STORE_KEY); if (raw) mem = JSON.parse(raw); } catch (e) { mem = null; }
-    if (!mem || typeof mem !== 'object' || !mem.lessons) {
-      mem = { lessons: {}, settings: { rate: 25, ownPrices: [40, 50] } };
-      SEED.forEach(function (r, i) {
-        mem.lessons['s' + i] = { date: r[0], start: r[1], end: r[2], name: r[3], tags: r[4] || [], source: r[5] || 'work', unitPrice: r[6] || 25 };
-      });
-    }
-    var warned = false;
+    var mem = readLocal() || { lessons: {}, settings: null };
+    var subs = [], ssubs = [], warned = false;
     function persist() {
       try { localStorage.setItem(STORE_KEY, JSON.stringify(mem)); }
-      catch (e) { if (!warned) { warned = true; toast('Opslaan in deze browser lukt niet. Maak een back-up met de knop Back-up.'); } }
+      catch (e) { if (!warned) { warned = true; toast('Opslaan in deze browser lukt niet. Maak een back-up via Account.'); } }
     }
-    function snapL() { return { docs: Object.keys(mem.lessons).map(function (id) { return { id: id, data: function () { return mem.lessons[id]; } }; }) }; }
-    function snapS() { return { exists: !!mem.settings, data: function () { return mem.settings; } }; }
-    function notify() { subs.lessons.forEach(function (f) { f(snapL()); }); subs.settings.forEach(function (f) { f(snapS()); }); }
-    persist();
-    var api = {
-      collection: function () {
-        return {
-          doc: function (id) {
-            return {
-              set: function (b) { mem.lessons[id] = b; persist(); notify(); return Promise.resolve(); },
-              delete: function () { delete mem.lessons[id]; persist(); notify(); return Promise.resolve(); }
-            };
-          },
-          onSnapshot: function (next) { subs.lessons.push(next); next(snapL()); }
-        };
-      },
-      doc: function () {
-        return {
-          set: function (b) { mem.settings = b; persist(); notify(); return Promise.resolve(); },
-          onSnapshot: function (next) { subs.settings.push(next); next(snapS()); }
-        };
-      },
-      exportJson: function () { return JSON.stringify({ app: 'rijlesplanner', lessons: mem.lessons, settings: mem.settings }, null, 1); },
-      importJson: function (text) {
-        var d = JSON.parse(text);
-        if (!d || typeof d.lessons !== 'object' || d.lessons === null) throw new Error('bad');
-        mem.lessons = d.lessons; if (d.settings) mem.settings = d.settings;
-        persist(); notify();
-      }
+    function list() { return Object.keys(mem.lessons).map(function (id) { var x = Object.assign({}, mem.lessons[id]); x.id = id; return x; }); }
+    function notify() { subs.forEach(function (f) { f(list(), false); }); ssubs.forEach(function (f) { f(mem.settings || null, false); }); }
+    return {
+      kind: 'local',
+      watchLessons: function (f) { subs.push(f); f(list(), false); },
+      watchSettings: function (f) { ssubs.push(f); f(mem.settings || null, false); },
+      put: function (id, b) { mem.lessons[id] = cleanLesson(b); persist(); notify(); return Promise.resolve(); },
+      remove: function (id) { delete mem.lessons[id]; persist(); notify(); return Promise.resolve(); },
+      putSettings: function (st) { mem.settings = st; persist(); notify(); return Promise.resolve(); },
+      putMany: function (map) { Object.keys(map).forEach(function (id) { mem.lessons[id] = cleanLesson(map[id]); }); persist(); notify(); return Promise.resolve(); },
+      stop: function () { subs = []; ssubs = []; }
     };
-    return api;
+  }
+
+  /* Elke gebruiker heeft een eigen map: users/<id>/lessons. De beveiligingsregels in Firebase zorgen dat niemand bij andermans lessen kan. */
+  function cloudDb(uid) {
+    var fs = firebase.firestore(), me = fs.collection('users').doc(uid), col = me.collection('lessons'), stops = [];
+    function fail(what) { return function () { toast(what + ' lukt niet. Controleer je internet en probeer het opnieuw.'); }; }
+    return {
+      kind: 'cloud',
+      watchLessons: function (f, err) {
+        stops.push(col.onSnapshot(function (snap) {
+          f(snap.docs.map(function (d) { var x = d.data() || {}; x.id = d.id; return x; }), snap.metadata.fromCache);
+        }, err));
+      },
+      watchSettings: function (f) {
+        stops.push(me.onSnapshot(function (d) {
+          var data = d.exists ? d.data() : null;
+          f(data && data.settings ? data.settings : null, d.metadata.fromCache);
+        }, function () {}));
+      },
+      /* Schrijven gaat meteen op het toestel en wordt verstuurd zodra er internet is; daarom niet wachten op de server. */
+      put: function (id, b) { col.doc(id).set(cleanLesson(b)).catch(fail('Opslaan')); return Promise.resolve(); },
+      remove: function (id) { col.doc(id).delete().catch(fail('Verwijderen')); return Promise.resolve(); },
+      putSettings: function (st) { me.set({ settings: st }, { merge: true }).catch(fail('Opslaan')); return Promise.resolve(); },
+      putMany: function (map) {
+        var ids = Object.keys(map), jobs = [];
+        for (var i = 0; i < ids.length; i += 400) {
+          var batch = fs.batch();
+          ids.slice(i, i + 400).forEach(function (id) { batch.set(col.doc(id), cleanLesson(map[id])); });
+          jobs.push(batch.commit());
+        }
+        return Promise.all(jobs);
+      },
+      stop: function () { stops.forEach(function (u) { try { u(); } catch (e) {} }); stops = []; }
+    };
+  }
+  function within(p, ms) { return Promise.race([p, new Promise(function (r) { setTimeout(r, ms); })]); }
+
+  function start(d) {
+    db = d; loaded = false; lessons = []; problem = ''; settingsKnown = false; settingsExist = false; asked = false;
+    cfg = normSettings(null, d.kind === 'local' ? DEFAULTS_LOCAL : DEFAULTS_NEW);
+    render();
+    d.watchSettings(function (st, fromCache) {
+      if (db !== d) return;
+      cfg = normSettings(st, d.kind === 'local' ? DEFAULTS_LOCAL : DEFAULTS_NEW);
+      if (!fromCache || st) { settingsKnown = true; settingsExist = !!st || d.kind === 'local'; }
+      render(); maybeAsk();
+    });
+    d.watchLessons(function (list) {
+      if (db !== d) return;
+      lessons = list; loaded = true; render(); maybeAsk();
+    }, function () { problem = 'Je lessen konden niet geladen worden. Ververs de pagina.'; render(); });
+  }
+
+  /* Na het inloggen: lessen van vóór de accounts overzetten, of een nieuw account laten kiezen welke rijscholen en prijzen */
+  function maybeAsk() {
+    if (!db || db.kind !== 'cloud' || asked || !settingsKnown || !loaded || !user || draft) return;
+    var n = localCount();
+    if (n && !store('rp-moved-' + user.uid)) { asked = true; openMove(n); return; }
+    if (!settingsExist) { asked = true; openAccount(true); }
+  }
+  function openMove(n) {
+    draft = { settings: true };
+    $('ov').replaceChildren(h('div', { class: 'card' },
+      h('h2', null, 'Lessen overzetten'),
+      h('p', null, 'Op dit toestel staan ' + n + (n === 1 ? ' les' : ' lessen') + ' van vóór je account. Zet ze in je account, dan zie je ze op al je apparaten.'),
+      h('p', { class: 'hint' }, 'Ze blijven ook op dit toestel bewaard, je raakt niets kwijt. Twee keer overzetten maakt geen dubbele lessen.'),
+      h('div', { class: 'err', id: 'mv-err', role: 'alert' }),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn primary', type: 'button', id: 'mv-go', onclick: function () { moveLocal(n); } }, 'Overzetten naar mijn account'),
+        h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Niet nu'))));
+    $('ov').hidden = false;
+  }
+  async function moveLocal(n) {
+    var m = readLocal();
+    if (!m || !user) return closeModal();
+    var go = $('mv-go'); go.disabled = true; go.textContent = 'Bezig met overzetten…';
+    try {
+      if (!settingsExist) { db.putSettings(normSettings(m.settings, DEFAULTS_LOCAL)); settingsExist = true; }
+      await within(db.putMany(m.lessons), 10000);
+      store('rp-moved-' + user.uid, '1');
+      closeModal(); render(); toast((n === 1 ? '1 les staat' : n + ' lessen staan') + ' nu in je account');
+    } catch (e) {
+      go.disabled = false; go.textContent = 'Overzetten naar mijn account';
+      var el = $('mv-err'); if (el) el.textContent = 'Overzetten lukt niet. Controleer je internet en probeer het opnieuw.';
+    }
+  }
+
+  /* ---------- account: instellingen, back-up, uitloggen ---------- */
+  function fmtNum(n) { return String(n).replace('.', ','); }
+  function openAccount(welcome) {
+    draft = { settings: true };
+    var f = { workUnit: cfg.workUnit, ownUnit: cfg.ownUnit };
+    function unitSeg(key, label) {
+      var bs = [50, 60].map(function (m) {
+        return h('button', { type: 'button', 'aria-pressed': f[key] === m ? 'true' : 'false', onclick: function () {
+          f[key] = m; bs.forEach(function (b, i) { b.setAttribute('aria-pressed', [50, 60][i] === m ? 'true' : 'false'); }); } }, m + ' min');
+      });
+      return h('div', { class: 'fld' }, h('span', { class: 'l' }, label), h('div', { class: 'seg', role: 'group', 'aria-label': label }, bs));
+    }
+    function school(k, color, title) {
+      var src = k === 'w' ? 'work' : 'own';
+      return h('div', { class: 'school' },
+        h('div', { class: 'sh' }, h('i', { class: 'sw ' + src }), title),
+        h('div', { class: 'fld' }, h('label', { for: 's-' + k + 'n' }, 'Naam'),
+          h('input', { type: 'text', id: 's-' + k + 'n', autocomplete: 'off', maxlength: '30', value: src === 'work' ? cfg.workName : cfg.ownName })),
+        h('div', { class: 'row2' },
+          h('div', { class: 'fld' }, h('label', { for: 's-' + k + 'p' }, 'Prijs in euro'),
+            h('input', { type: 'text', id: 's-' + k + 'p', inputmode: 'decimal', autocomplete: 'off', placeholder: '40, 50',
+              value: (src === 'work' ? cfg.workPrices : cfg.ownPrices).map(fmtNum).join(', ') })),
+          unitSeg(src === 'work' ? 'workUnit' : 'ownUnit', 'Per')));
+    }
+    var n = localCount(), canMove = user && n && !store('rp-moved-' + user.uid);
+    var card = h('form', { class: 'card', onsubmit: function (e) { e.preventDefault(); saveSettings(f, welcome); } },
+      h('h2', null, welcome ? 'Welkom bij Karta Drive' : 'Account'),
+      welcome ? h('p', null, 'Vul de namen van je twee rijscholen (of werkgever en eigen leerlingen) en je prijzen in. Je kunt dit later altijd aanpassen via Account.') : null,
+      user ? h('div', { class: 'who' }, h('span', { class: 'hint' }, 'Ingelogd als'), h('b', null, user.email || '')) :
+        h('p', { class: 'hint' }, 'Je lessen staan op dit toestel.'),
+      h('h3', null, 'Rijscholen en prijzen'),
+      school('w', 'work', 'Blauwe lessen'),
+      school('o', 'own', 'Oranje lessen'),
+      h('p', { class: 'hint' }, 'Meerdere prijzen? Zet er een komma met een spatie tussen, bijvoorbeeld 40, 50. Lessen die al in je agenda staan houden hun eigen prijs.'),
+      h('div', { class: 'err', id: 's-err', role: 'alert' }),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn primary', type: 'submit' }, welcome ? 'Klaar' : 'Opslaan'),
+        welcome ? null : h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten')),
+      welcome ? null : h('h3', null, 'Back-up'),
+      welcome ? null : h('p', { class: 'hint' }, user ? 'Je lessen staan veilig in je account. Wil je toch een kopie als bestand? Dat kan hier.' :
+        'Je lessen staan op dit toestel. Maak af en toe een back-up, dan raak je niets kwijt.'),
+      welcome ? null : h('div', { class: 'acts' },
+        h('button', { class: 'btn', type: 'button', onclick: downloadBackup }, 'Back-up maken'),
+        h('button', { class: 'btn', type: 'button', onclick: function () { $('s-file').click(); } }, 'Back-up laden'),
+        h('input', { type: 'file', id: 's-file', accept: '.json,application/json', hidden: true, onchange: function (e) { loadBackup(e.target.files[0]); } })),
+      canMove ? h('button', { class: 'btn', type: 'button', onclick: function () { openMove(n); } }, 'Lessen van dit toestel overzetten (' + n + ')') : null,
+      user && !welcome ? h('div', { class: 'acts' }, h('span', { class: 'sp' }),
+        h('button', { class: 'btn danger', type: 'button', onclick: logOut }, 'Uitloggen')) : null,
+      h('p', { class: 'hint' }, 'Versie ' + BUILD));
+    $('ov').replaceChildren(card); $('ov').hidden = false;
+  }
+  function saveSettings(f, welcome) {
+    var wn = $('s-wn').value.trim(), on = $('s-on').value.trim(), err = $('s-err');
+    var wp = prices($('s-wp').value, []), op = prices($('s-op').value, []);
+    if (!wn || !on) { err.textContent = 'Vul bij allebei een naam in.'; return; }
+    if (!wp.length || !op.length) { err.textContent = 'Vul bij allebei een prijs in.'; return; }
+    var st = normSettings({ workName: wn, ownName: on, workPrices: wp, ownPrices: op, workUnit: f.workUnit, ownUnit: f.ownUnit }, cfg);
+    db.putSettings(st); cfg = st; settingsExist = true;
+    closeModal(); render(); toast(welcome ? 'Klaar! Tik op + Les om je eerste les te plannen.' : 'Opgeslagen');
+  }
+  function logOut() {
+    closeModal();
+    if (db) { db.stop(); db = null; }
+    firebase.auth().signOut();
   }
   function downloadBackup() {
-    var blob = new Blob([db.exportJson()], { type: 'application/json' });
+    var map = {};
+    lessons.forEach(function (l) { map[l.id] = cleanLesson(l); });
+    var blob = new Blob([JSON.stringify({ app: 'rijlesplanner', lessons: map, settings: cfg }, null, 1)], { type: 'application/json' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'rijlesplanner-backup-' + todayStr() + '.json';
+    a.download = 'karta-drive-backup-' + todayStr() + '.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
   }
   function loadBackup(file) {
     if (!file) return;
     var r = new FileReader();
-    r.onload = function () {
-      try { db.importJson(String(r.result)); closeModal(); toast('Back-up geladen'); }
-      catch (e) { var el = document.getElementById('s-err'); if (el) el.textContent = 'Dit bestand is geen geldige back-up.'; }
+    r.onload = async function () {
+      var d;
+      try { d = JSON.parse(String(r.result)); if (!d || typeof d.lessons !== 'object' || d.lessons === null) throw new Error('bad'); }
+      catch (e) { var el = $('s-err'); if (el) el.textContent = 'Dit bestand is geen geldige back-up.'; return; }
+      try { await within(db.putMany(d.lessons), 10000); closeModal(); toast('Back-up geladen'); }
+      catch (e) { var el2 = $('s-err'); if (el2) el2.textContent = 'Laden lukt niet. Controleer je internet en probeer het opnieuw.'; }
     };
     r.readAsText(file);
+  }
+
+  /* ---------- inlogscherm ---------- */
+  var authMode = 'in', gateInfo = '';
+  var AUTH_MSG = {
+    'auth/invalid-credential': 'E-mailadres of wachtwoord klopt niet.',
+    'auth/invalid-login-credentials': 'E-mailadres of wachtwoord klopt niet.',
+    'auth/wrong-password': 'E-mailadres of wachtwoord klopt niet.',
+    'auth/user-not-found': 'Er is geen account met dit e-mailadres. Kies Account maken.',
+    'auth/email-already-in-use': 'Er is al een account met dit e-mailadres. Kies Inloggen.',
+    'auth/weak-password': 'Kies een wachtwoord van minstens 6 tekens.',
+    'auth/invalid-email': 'Dit e-mailadres klopt niet.',
+    'auth/missing-email': 'Vul je e-mailadres in.',
+    'auth/too-many-requests': 'Te veel pogingen. Wacht even en probeer het dan opnieuw.',
+    'auth/network-request-failed': 'Geen internetverbinding. Probeer het opnieuw.',
+    'auth/user-disabled': 'Dit account is uitgeschakeld.',
+    'auth/operation-not-allowed': 'Inloggen met e-mail staat nog niet aan in Firebase.'
+  };
+  function authMsg(x) { return AUTH_MSG[x && x.code] || 'Dat lukte niet. Probeer het opnieuw.'; }
+  function showGate() {
+    $('app').hidden = true; $('gate').hidden = false;
+    var up = authMode === 'up';
+    function tab(mode, label) {
+      return h('button', { type: 'button', 'aria-pressed': authMode === mode ? 'true' : 'false', onclick: function () {
+        if (authMode !== mode) { keepMail(); authMode = mode; gateInfo = ''; showGate(); var m = $('g-mail'); if (m && !m.value) m.focus(); else if ($('g-pw')) $('g-pw').focus(); } } }, label);
+    }
+    $('gate').replaceChildren(h('form', { class: 'gcard', novalidate: true, onsubmit: doAuth },
+      h('img', { src: 'icon-192.png', alt: '', class: 'glogo', width: '60', height: '60' }),
+      h('h1', null, 'Karta Drive'),
+      h('p', { class: 'hint' }, up ? 'Maak een eigen account. Je lessen worden veilig online bewaard en je ziet ze op al je apparaten.' :
+        'Log in om je agenda te zien.'),
+      h('div', { class: 'seg gseg', role: 'group', 'aria-label': 'Inloggen of account maken' }, tab('in', 'Inloggen'), tab('up', 'Account maken')),
+      h('div', { class: 'fld' }, h('label', { for: 'g-mail' }, 'E-mailadres'),
+        h('input', { type: 'email', id: 'g-mail', autocomplete: 'email', inputmode: 'email', autocapitalize: 'off', spellcheck: 'false', value: store('rp-email') || '' })),
+      h('div', { class: 'fld' }, h('label', { for: 'g-pw' }, 'Wachtwoord'),
+        h('input', { type: 'password', id: 'g-pw', autocomplete: up ? 'new-password' : 'current-password', minlength: '6' })),
+      up ? h('div', { class: 'fld' }, h('label', { for: 'g-pw2' }, 'Herhaal wachtwoord'),
+        h('input', { type: 'password', id: 'g-pw2', autocomplete: 'new-password', minlength: '6' })) : null,
+      up ? h('p', { class: 'hint' }, 'Minstens 6 tekens.') : null,
+      h('div', { class: 'err', id: 'g-err', role: 'alert' }),
+      gateInfo ? h('div', { class: 'ok', role: 'status' }, gateInfo) : null,
+      h('button', { class: 'btn primary big', type: 'submit', id: 'g-go' }, up ? 'Account maken' : 'Inloggen'),
+      up ? null : h('button', { type: 'button', class: 'linkbtn', onclick: resetPw }, 'Wachtwoord vergeten?')));
+  }
+  function keepMail() { var m = $('g-mail'); if (m) store('rp-email', m.value.trim()); }
+  async function doAuth(e) {
+    e.preventDefault();
+    var mail = $('g-mail').value.trim(), pw = $('g-pw').value, err = $('g-err'), go = $('g-go'), up = authMode === 'up';
+    err.textContent = '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { err.textContent = 'Vul een geldig e-mailadres in.'; return; }
+    if (pw.length < 6) { err.textContent = up ? 'Kies een wachtwoord van minstens 6 tekens.' : 'Vul je wachtwoord in.'; return; }
+    if (up && pw !== $('g-pw2').value) { err.textContent = 'De twee wachtwoorden zijn niet hetzelfde.'; return; }
+    store('rp-email', mail);
+    go.disabled = true; go.textContent = 'Even geduld…';
+    try {
+      if (up) await firebase.auth().createUserWithEmailAndPassword(mail, pw);
+      else await firebase.auth().signInWithEmailAndPassword(mail, pw);
+    } catch (x) {
+      err.textContent = authMsg(x);
+      go.disabled = false; go.textContent = up ? 'Account maken' : 'Inloggen';
+    }
+  }
+  async function resetPw() {
+    var mail = $('g-mail').value.trim(), err = $('g-err');
+    err.textContent = '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { err.textContent = 'Vul eerst je e-mailadres in, dan sturen we je een link.'; $('g-mail').focus(); return; }
+    store('rp-email', mail);
+    try {
+      await firebase.auth().sendPasswordResetEmail(mail);
+      gateInfo = 'Als er een account is met ' + mail + ', staat er nu een e-mail klaar met een link om een nieuw wachtwoord te kiezen. Kijk ook in je spam.';
+      showGate();
+    } catch (x) { err.textContent = authMsg(x); }
   }
 
   /* ---------- datumkiezer en actuele datum ---------- */
@@ -805,13 +1063,34 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   document.addEventListener('visibilitychange', function () { if (!document.hidden) { tick(); if (loaded && $('ov').hidden) render(); } });
   window.addEventListener('focus', tick);
 
-  render();
-  (async function init() {
-    db = localDb();
-    db.collection('lessons').onSnapshot(function (snap) {
-      lessons = snap.docs.map(function (d) { var x = d.data() || {}; x.id = d.id; return x; });
-      loaded = true; render();
-    }, function () { problem = 'Je lessen konden niet geladen worden. Ververs de pagina.'; render(); });
+  (function boot() {
+    if (!CLOUD_WANTED) { start(localDb()); return; }
+    if (!CLOUD) {
+      /* De inlogcode kon niet geladen worden: meestal geen internet bij de allereerste keer openen */
+      problem = 'Geen internetverbinding. Verbind met internet en open Karta Drive opnieuw.';
+      $('gate').hidden = true; render(); return;
+    }
+    $('app').hidden = true; $('gate').hidden = false;
+    $('gate').replaceChildren(h('div', { class: 'status' }, 'Laden…'));
+    firebase.initializeApp(FB);
+    firebase.auth().languageCode = 'nl';
+    try { firebase.firestore().enablePersistence({ synchronizeTabs: true }).catch(function () {}); } catch (e) {}
+    firebase.auth().onAuthStateChanged(function (u) {
+      if (db) { db.stop(); db = null; }
+      user = u;
+      closeModal(); closePicker();
+      if (!u) {
+        lessons = []; loaded = false;
+        authMode = store('rp-has-account') || !localCount() ? 'in' : 'up';
+        gateInfo = '';
+        showGate();
+        return;
+      }
+      store('rp-has-account', '1');
+      $('gate').hidden = true; $('gate').replaceChildren(); $('app').hidden = false;
+      cursor = todayStr(); scrolled = false;
+      start(cloudDb(u.uid));
+    });
   })();
 })();
 </script>

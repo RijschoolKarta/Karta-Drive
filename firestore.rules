@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Iedereen ziet en wijzigt alleen zijn eigen gegevens: users/<eigen id>/...
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      match /lessons/{lessonId} {
+        allow read, delete: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['date', 'start', 'end', 'name', 'source', 'unitPrice', 'unitMin', 'tags'])
+          && request.resource.data.date is string && request.resource.data.name is string;
+      }
+    }
+    // Al het andere is dicht
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

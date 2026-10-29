@@ -1,12 +1,12 @@
 /* Karta Drive: laatste versie bij elke start, en werkt ook zonder internet */
-var CACHE = 'karta-drive-v1';
-var CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
+var CACHE = 'karta-drive-v2';
+var CORE = ['./', 'index.html', 'firebase-config.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (keys) {
-    return Promise.all(keys.filter(function (k) { return k !== CACHE && k !== 'fonts'; }).map(function (k) { return caches.delete(k); }));
+    return Promise.all(keys.filter(function (k) { return k !== CACHE && k !== 'fonts' && k !== 'libs'; }).map(function (k) { return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
 /* Eerst het internet (altijd gecontroleerd op een nieuwe versie). Is het traag of offline, dan de bewaarde versie. */
@@ -35,6 +35,13 @@ self.addEventListener('fetch', function (e) {
   var url = new URL(req.url);
   if (url.origin === location.origin) {
     e.respondWith(latest(req));
+  } else if (url.hostname === 'www.gstatic.com' && url.pathname.indexOf('/firebasejs/') === 0) {
+    /* De inlogcode van Firebase heeft een vast versienummer: één keer ophalen, daarna ook zonder internet */
+    e.respondWith(caches.open('libs').then(function (c) {
+      return c.match(req).then(function (hit) {
+        return hit || fetch(req).then(function (res) { if (res && res.ok) c.put(req, res.clone()); return res; });
+      });
+    }));
   } else if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     e.respondWith(caches.open('fonts').then(function (c) {
       return c.match(req).then(function (hit) {
