@@ -276,15 +276,22 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .blk .etag, .etag { display: inline-block; width: auto; font: 700 9.5px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; background: var(--exam-line); color: #fff; border-radius: 3px; padding: 2px 4px; margin-right: 4px; vertical-align: 1px; }
 .btn.exam { border-color: var(--exam-line); color: var(--exam-ink); background: var(--exam-bg); font-weight: 600; }
 .btn.exam:hover { filter: brightness(.97); }
-.examsw { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 10px; padding: 10px 12px; text-align: left; }
-.examsw .knob { flex: none; width: 40px; height: 24px; border-radius: 99px; background: var(--line-strong); position: relative; transition: background .15s; }
-.examsw .knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s; }
-.examsw[aria-pressed="true"] { border-color: var(--exam-line); background: var(--exam-bg); color: var(--exam-ink); }
-.examsw[aria-pressed="true"] .knob { background: var(--exam-line); }
-.examsw[aria-pressed="true"] .knob::after { transform: translateX(16px); }
-.examsw b { display: block; }
-.examsw small { color: var(--muted); }
-.examsw[aria-pressed="true"] small { color: inherit; opacity: .8; }
+.drop { border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); }
+.drop > summary { list-style: none; cursor: pointer; padding: 9px 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 40px; }
+.drop > summary::-webkit-details-marker { display: none; }
+.drop > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.drop .lph { color: var(--muted); }
+.drop .chev { color: var(--accent); transition: transform .15s; flex: none; }
+.drop[open] .chev { transform: rotate(180deg); }
+.drop .sel { display: flex; flex-wrap: wrap; gap: 5px; }
+.drop .lab { font-size: 12.5px; font-weight: 600; border-radius: 99px; padding: 3px 9px; background: var(--accent-soft); color: var(--accent); }
+.drop .lab.exam { background: var(--exam-bg); color: var(--exam-ink); }
+.dropbody { border-top: 1px solid var(--line); padding: 4px 12px 12px; display: flex; flex-direction: column; }
+.opt { display: flex; align-items: center; gap: 12px; padding: 10px 0; cursor: pointer; border-bottom: 1px solid var(--line); }
+.opt input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); flex: none; }
+.opt.exam input { accent-color: var(--exam-line); }
+.opt small { color: var(--muted); margin-left: auto; font-size: 12px; }
+.dropbody .fld { margin-top: 10px; }
 .card.isexam h2 { color: var(--exam-ink); }
 </style>
 </head>
@@ -616,12 +623,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     confirmDel = false; formErr = '';
     if (lesson) {
       draft = { id: lesson.id, date: lesson.date, start: lesson.start, end: lesson.end, name: lesson.name || '',
-        tags: (lesson.tags || []).join(', '), source: srcOf(lesson), unitPrice: unitOf(lesson), unitMin: lessonUnit(lesson), exam: !!lesson.exam, durTouched: true };
+        tags: splitGear(lesson.tags).rest.join(', '), gear: splitGear(lesson.tags).gear, source: srcOf(lesson), unitPrice: unitOf(lesson), unitMin: lessonUnit(lesson), exam: !!lesson.exam, durTouched: true };
     } else {
       var src = store('rp-source') === 'own' ? 'own' : 'work';
       var st = startMin;
       if (st == null) { var day = lessonsOn(date), last = day[day.length - 1]; st = last ? toMin(last.end) : 9 * 60; }
-      draft = { id: null, date: date, start: toTime(st), end: toTime(st + (src === 'own' ? UNIT : 2 * UNIT)), name: '', tags: '',
+      draft = { id: null, date: date, start: toTime(st), end: toTime(st + (src === 'own' ? UNIT : 2 * UNIT)), name: '', tags: '', gear: '',
         source: src, unitPrice: defaultPrice(src), unitMin: unitMin(src), exam: !!exam, durTouched: false };
     }
     buildModal();
@@ -664,16 +671,55 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     $('m-so').setAttribute('aria-pressed', src === 'own' ? 'true' : 'false');
     refreshChips();
   }
+  /* Labels: uitklapmenu met vinkjes (schakel/automaat, examen) en een vrij veld voor eigen labels */
+  var GEARS = ['Schakel', 'Automaat'];
+  function splitGear(tags) {
+    var gear = '', rest = [];
+    (tags || []).forEach(function (t) { var g = GEARS.filter(function (x) { return x.toLowerCase() === String(t).trim().toLowerCase(); })[0]; if (g) gear = g; else rest.push(t); });
+    return { gear: gear, rest: rest };
+  }
+  function freeTags() { return draft.tags.split(',').map(function (t) { return t.trim(); }).filter(function (t) { return t && !splitGear([t]).gear; }); }
+  function renderLabelSum() {
+    var el = $('m-labsum'); if (!el) return;
+    var items = [];
+    if (draft.gear) items.push(h('span', { class: 'lab' }, draft.gear));
+    if (draft.exam) items.push(h('span', { class: 'lab exam' }, 'Examen'));
+    freeTags().forEach(function (t) { items.push(h('span', { class: 'lab' }, t)); });
+    el.replaceChildren(items.length ? h('span', { class: 'sel' }, items) : h('span', { class: 'lph' }, 'Kies labels (optioneel)'));
+  }
+  function labelDrop() {
+    var boxes = {};
+    function opt(label, key, cls, hint) {
+      var on = key === 'exam' ? draft.exam : draft.gear === label;
+      var box = h('input', { type: 'checkbox', checked: on, onchange: function (e) {
+        if (key === 'exam') {
+          draft.exam = e.target.checked;
+          var card = e.target.closest('.card'); if (card) card.classList.toggle('isexam', draft.exam);
+          $('m-title').textContent = modalTitle(!draft.id);
+        } else {
+          draft.gear = e.target.checked ? label : '';
+          GEARS.forEach(function (g) { if (g !== label && boxes[g]) boxes[g].checked = false; });
+        }
+        renderLabelSum();
+      } });
+      boxes[label] = box;
+      return h('label', { class: 'opt' + (cls ? ' ' + cls : '') }, box, h('span', null, label), hint ? h('small', null, hint) : null);
+    }
+    var d = h('details', { class: 'drop', id: 'm-drop' },
+      h('summary', { 'aria-labelledby': 'm-labl' }, h('span', { id: 'm-labsum' }), h('span', { class: 'chev', 'aria-hidden': 'true' }, '▾')),
+      h('div', { class: 'dropbody' },
+        opt('Schakel', 'gear'), opt('Automaat', 'gear'), opt('Examen', 'exam', 'exam', 'paars in je agenda'),
+        h('div', { class: 'fld' }, h('label', { for: 'm-tags' }, 'Eigen label'),
+          h('input', { type: 'text', id: 'm-tags', autocomplete: 'off', placeholder: 'Bijv. A, 1, PROEFLES', value: draft.tags,
+            oninput: function (e) { draft.tags = e.target.value; renderLabelSum(); } }))));
+    setTimeout(renderLabelSum, 0);
+    return d;
+  }
   function modalTitle(isNew) { return draft.exam ? (isNew ? 'Nieuw examen' : 'Examen wijzigen') : (isNew ? 'Nieuwe les' : 'Les wijzigen'); }
   function buildModal() {
     var isNew = !draft.id;
     var form = h('form', { class: 'card' + (draft.exam ? ' isexam' : ''), onsubmit: function (e) { e.preventDefault(); if (!saving) saveLesson(); } },
       h('h2', { id: 'm-title' }, modalTitle(isNew)),
-      h('button', { type: 'button', class: 'examsw', id: 'm-exam', 'aria-pressed': draft.exam ? 'true' : 'false', onclick: function () {
-        draft.exam = !draft.exam;
-        this.setAttribute('aria-pressed', draft.exam ? 'true' : 'false');
-        form.classList.toggle('isexam', draft.exam); $('m-title').textContent = modalTitle(isNew); } },
-        h('span', null, h('b', null, 'Examen'), h('small', null, 'Krijgt een eigen paarse kleur in je agenda')), h('span', { class: 'knob', 'aria-hidden': 'true' })),
       h('div', { class: 'fld' }, h('label', { for: 'm-name' }, 'Leerling'),
         h('input', { type: 'text', id: 'm-name', autocomplete: 'off', placeholder: 'Naam', value: draft.name, oninput: function (e) { draft.name = e.target.value; } })),
       h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Rijschool'),
@@ -693,8 +739,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Duur'), h('div', { class: 'chips', id: 'm-dur' })),
       h('div', { class: 'fld' }, h('span', { class: 'l', id: 'm-plbl' }, 'Prijs per ' + draft.unitMin + ' minuten'), h('div', { class: 'chips', id: 'm-price' })),
       h('div', { class: 'total' }, h('span', null, 'Totaal voor ', h('span', { id: 'm-dsum' })), h('b', { id: 'm-total' })),
-      h('div', { class: 'fld' }, h('label', { for: 'm-tags' }, 'Labels (optioneel)'),
-        h('input', { type: 'text', id: 'm-tags', autocomplete: 'off', placeholder: 'A, 1, PROEFLES', value: draft.tags, oninput: function (e) { draft.tags = e.target.value; } })),
+      h('div', { class: 'fld' }, h('span', { class: 'l', id: 'm-labl' }, 'Labels'), labelDrop()),
       h('div', { class: 'err', id: 'm-err', role: 'alert' }, formErr),
       h('div', { class: 'acts' },
         h('button', { class: 'btn primary', type: 'submit' }, isNew ? 'Toevoegen' : 'Opslaan'),
@@ -712,7 +757,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     if (!/^\d{4}-\d{2}-\d{2}$/.test(draft.date)) return 'Kies een datum.';
     if (typeof draft.unitPrice !== 'number' || isNaN(draft.unitPrice) || draft.unitPrice < 0) return 'Vul een prijs in.';
     return { date: draft.date, start: draft.start, end: draft.end, name: name, source: draft.source, unitPrice: draft.unitPrice, unitMin: draft.unitMin,
-      tags: draft.tags.split(',').map(function (t) { return t.trim(); }).filter(Boolean), exam: !!draft.exam };
+      tags: (draft.gear ? [draft.gear] : []).concat(freeTags()), exam: !!draft.exam };
   }
   function newId() { return 'l' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   async function saveLesson() {
@@ -765,7 +810,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '4 · 29 okt 2026';
+  var BUILD = '5 · 29 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
