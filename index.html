@@ -29,17 +29,21 @@
   --accent: #0B5CAD;
   --accent-ink: #FFFFFF;
   --accent-soft: #E3EEF9;
-  --work-bg: #D6E6F7;
-  --work-ink: #0A3F7A;
-  --own-bg: #FBE2BE;
-  --own-ink: #7A4300;
-  --workE-bg: #CDEEE8;
-  --workE-ink: #0A5A50;
-  --ownE-bg: #F7D3CC;
-  --ownE-ink: #8A2B1F;
-  --exam-bg: #E8DAFB;
+  /* Kleuren: rijschool = kleur (blauw / oranje), blokuur = vol, enkel uur = licht met streep, examen = vol paars */
+  --work-c: #1F66C6;
+  --own-c: #C45A00;
+  --exam-c: #6D35D9;
+  --work-bg: #1F66C6;
+  --work-ink: #FFFFFF;
+  --own-bg: #C45A00;
+  --own-ink: #FFFFFF;
+  --workE-bg: #DCE9FB;
+  --workE-ink: #0D3B7A;
+  --ownE-bg: #FDE6CC;
+  --ownE-ink: #6E3400;
+  --exam-bg: #ECE2FD;
   --exam-ink: #4A1D8C;
-  --exam-line: #7C3AED;
+  --exam-line: #6D35D9;
   --now: #D93025;
   --danger: #B3261E;
   --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
@@ -49,8 +53,8 @@
   :root:not([data-theme="light"]) {
     --bg: #11161C; --surface: #19212A; --ink: #E7ECF0; --muted: #9AA7B3; --line: #26303B; --line-strong: #36424F;
     --accent: #5FA6F2; --accent-ink: #08121C; --accent-soft: #16293D;
-    --work-bg: #1F3B5A; --work-ink: #A9D0F7; --own-bg: #4A3412; --own-ink: #F2C788;
-    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE; --exam-bg: #3B2560; --exam-ink: #DCC8FB; --exam-line: #A97CF5;
+    --work-c: #3A7BDC; --own-c: #C8650F; --exam-c: #7A4BE0; --work-bg: #2D6FD1; --work-ink: #FFFFFF; --own-bg: #B85A0A; --own-ink: #FFFFFF;
+    --workE-bg: #15283F; --workE-ink: #A8CBF5; --ownE-bg: #35240F; --ownE-ink: #F3C27E; --exam-bg: #2E2050; --exam-ink: #D4C0FA; --exam-line: #9B74F0;
     --now: #FF6B5F; --danger: #F2867F;
     color-scheme: dark;
   }
@@ -58,8 +62,8 @@
 :root[data-theme="dark"] {
   --bg: #11161C; --surface: #19212A; --ink: #E7ECF0; --muted: #9AA7B3; --line: #26303B; --line-strong: #36424F;
   --accent: #5FA6F2; --accent-ink: #08121C; --accent-soft: #16293D;
-  --work-bg: #1F3B5A; --work-ink: #A9D0F7; --own-bg: #4A3412; --own-ink: #F2C788;
-    --workE-bg: #16433E; --workE-ink: #9FE0D4; --ownE-bg: #4F2621; --ownE-ink: #F6B8AE; --exam-bg: #3B2560; --exam-ink: #DCC8FB; --exam-line: #A97CF5;
+  --work-c: #3A7BDC; --own-c: #C8650F; --exam-c: #7A4BE0; --work-bg: #2D6FD1; --work-ink: #FFFFFF; --own-bg: #B85A0A; --own-ink: #FFFFFF;
+    --workE-bg: #15283F; --workE-ink: #A8CBF5; --ownE-bg: #35240F; --ownE-ink: #F3C27E; --exam-bg: #2E2050; --exam-ink: #D4C0FA; --exam-line: #9B74F0;
   --now: #FF6B5F; --danger: #F2867F;
   color-scheme: dark;
 }
@@ -123,8 +127,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .sum .val { font: 700 28px/1 var(--font-display); }
 .sum .split { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
 .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
-.dot.work { background: var(--work-ink); }
-.dot.own { background: var(--own-ink); }
+.dot.work { background: var(--work-c); }
+.dot.own { background: var(--own-c); }
 
 .cal { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .scroll { overflow: auto; height: clamp(420px, 68vh, 760px); }
@@ -279,10 +283,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .acct svg { width: 16px; height: 16px; }
 @media (max-width: 640px) { .card input[type="text"], .card input[type="number"], .card input[type="time"], .card input[type="date"] { font-size: 16px; } }
 /* Examen: eigen paarse kleur, gaat voor de kleur van de rijschool */
-.blk.exam, .blk.exam.enkel { background: var(--exam-bg); color: var(--exam-ink); box-shadow: inset 3px 0 0 var(--exam-line); }
-.pill.exam, .pill.exam.enkel { background: var(--exam-bg); color: var(--exam-ink); }
-.sw.exam { background: var(--exam-bg); border-color: var(--exam-line); }
-.blk .etag, .etag { display: inline-block; width: auto; font: 700 9.5px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; background: var(--exam-line); color: #fff; border-radius: 3px; padding: 2px 4px; margin-right: 4px; vertical-align: 1px; }
+.blk.exam, .blk.exam.enkel { background: var(--exam-c); color: #FFFFFF; box-shadow: none; }
+.pill.exam, .pill.exam.enkel { background: var(--exam-c); color: #FFFFFF; box-shadow: none; }
+.sw.exam { background: var(--exam-c); border-color: var(--exam-c); }
+.blk .etag, .etag { display: inline-block; width: auto; font: 700 9.5px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; background: rgba(255, 255, 255, .24); color: inherit; border-radius: 3px; padding: 2px 4px; margin-right: 4px; vertical-align: 1px; }
 .drop { border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); }
 .drop > summary { list-style: none; cursor: pointer; padding: 9px 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 40px; }
 .drop > summary::-webkit-details-marker { display: none; }
@@ -300,6 +304,26 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .opt small { color: var(--muted); margin-left: auto; font-size: 12px; }
 .dropbody .fld { margin-top: 10px; }
 .card.isexam h2 { color: var(--exam-ink); }
+/* Enkel uur: lichte tint met een streep in de kleur van de rijschool */
+.blk.work.enkel { box-shadow: inset 4px 0 0 var(--work-c); padding-left: 9px; }
+.blk.own.enkel { box-shadow: inset 4px 0 0 var(--own-c); padding-left: 9px; }
+.pill.work.enkel { box-shadow: inset 3px 0 0 var(--work-c); }
+.pill.own.enkel { box-shadow: inset 3px 0 0 var(--own-c); }
+.sw.work { background: var(--work-c); border-color: var(--work-c); }
+.sw.own { background: var(--own-c); border-color: var(--own-c); }
+.sw.work.enkel { background: var(--workE-bg); border: 0; box-shadow: inset 4px 0 0 var(--work-c), inset 0 0 0 1px var(--work-c); }
+.sw.own.enkel { background: var(--ownE-bg); border: 0; box-shadow: inset 4px 0 0 var(--own-c), inset 0 0 0 1px var(--own-c); }
+.blk.exam .etag { background: rgba(255, 255, 255, .24); }
+/* Rijschoolkeuze in het lesvenster in de kleur van de rijschool */
+#m-sw[aria-pressed="true"] { background: var(--work-c); color: #FFFFFF; }
+#m-so[aria-pressed="true"] { background: var(--own-c); color: #FFFFFF; }
+@media (max-width: 640px) {
+  .mc .pill.work { background: var(--work-c); }
+  .mc .pill.own { background: var(--own-c); }
+  .mc .pill.work.enkel { background: transparent; box-shadow: inset 0 0 0 2px var(--work-c); }
+  .mc .pill.own.enkel { background: transparent; box-shadow: inset 0 0 0 2px var(--own-c); }
+  .mc .pill.exam { background: var(--exam-c); box-shadow: none; }
+}
 </style>
 </head>
 <body>
@@ -812,7 +836,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '7 · 29 okt 2026';
+  var BUILD = '8 · 30 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
