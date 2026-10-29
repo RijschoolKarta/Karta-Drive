@@ -372,6 +372,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .stmain b { font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stmain span { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stside { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 12.5px; text-align: right; }
+.recv { font-weight: 700; font-size: 15px; color: #1E8A4C; white-space: nowrap; }
+.recv small { font-weight: 500; font-size: 12px; color: var(--muted); }
+.recv.zero { color: var(--muted); font-weight: 600; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .recv:not(.zero), :root:not([data-theme="light"]) .stat.good .val { color: #4CC27E; } }
+:root[data-theme="dark"] .recv:not(.zero), :root[data-theme="dark"] .stat.good .val { color: #4CC27E; }
 .badge { border-radius: 99px; padding: 3px 8px; font-weight: 600; font-size: 12px; white-space: nowrap; }
 .badge.open { background: var(--ownE-bg); color: var(--ownE-ink); }
 .badge.exam { background: var(--exam-c); color: #FFFFFF; }
@@ -952,7 +957,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '11 · 30 okt 2026';
+  var BUILD = '12 · 30 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
@@ -1482,6 +1487,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       s.examLast = exams.filter(isPast).pop() || null;
       var open = s.list.filter(isOpenPay);
       s.open = open.reduce(function (t, l) { return t + priceOf(l); }, 0); s.openList = open;
+      s.received = past.reduce(function (t, l) { return t + (isOpenPay(l) ? 0 : priceOf(l)); }, 0);
       var own = s.list.filter(function (l) { return srcOf(l) === 'own'; }).length;
       s.src = own * 2 >= s.list.length ? 'own' : 'work';
       s.mixed = own > 0 && own < s.list.length;
@@ -1494,7 +1500,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function renderStudents() {
     if (pageFresh || !$('st-list')) {
       $('ptools').replaceChildren();
-      var sortBtns = [['recent', 'Recent'], ['naam', 'A–Z'], ['open', 'Openstaand']].map(function (o) {
+      var sortBtns = [['recent', 'Recent'], ['naam', 'A–Z'], ['ontvangen', 'Meest ontvangen'], ['open', 'Openstaand']].map(function (o) {
         return h('button', { type: 'button', class: 'chip', 'data-sort': o[0], 'aria-pressed': studentSort === o[0] ? 'true' : 'false', onclick: function () {
           studentSort = o[0]; Array.prototype.forEach.call(document.querySelectorAll('[data-sort]'), function (b) { b.setAttribute('aria-pressed', b.dataset.sort === studentSort ? 'true' : 'false'); }); fillStudents(); } }, o[1]);
       });
@@ -1524,6 +1530,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     list.sort(function (a, b) {
       if (studentSort === 'naam') return a.name.localeCompare(b.name, 'nl');
       if (studentSort === 'open') return b.open - a.open || a.name.localeCompare(b.name, 'nl');
+      if (studentSort === 'ontvangen') return b.received - a.received || a.name.localeCompare(b.name, 'nl');
       return a.lastWhen < b.lastWhen ? 1 : a.lastWhen > b.lastWhen ? -1 : 0;
     });
     if (!all.length) { $('st-list').replaceChildren(h('div', { class: 'status' }, 'Nog geen leerlingen. Ze verschijnen hier vanzelf zodra je lessen in je agenda zet.')); return; }
@@ -1535,6 +1542,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         h('span', { class: 'av ' + s.src + (s.mixed ? ' mixed' : '') }, initials(s.name)),
         h('span', { class: 'stmain' }, h('b', null, s.name), h('span', null, sub.join(' · '))),
         h('span', { class: 'stside' },
+          h('span', { class: 'recv' + (s.received ? '' : ' zero') }, eur(s.received), h('small', null, ' ontvangen')),
           s.examNext ? h('span', { class: 'badge exam' }, 'Examen ' + dayLabel(s.examNext.date)) : null,
           s.open > 0 ? h('span', { class: 'badge open' }, eur(s.open) + ' open') : null,
           s.next && !s.examNext ? h('span', { class: 'badge next' }, 'Volgende: ' + dayLabel(s.next.date)) : null));
@@ -1550,7 +1558,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       ['Gepland', s.fut.length ? s.fut.length + (s.fut.length === 1 ? ' les' : ' lessen') : 'geen'],
       ['Schakel / automaat', s.gear || 'niet ingevuld'],
       ['Examen', s.examNext ? dayLabel(s.examNext.date) + ' ' + s.examNext.start : s.examLast ? 'gehad op ' + dayLabel(s.examLast.date) : 'nog niet gepland'],
-      ['Totaal verdiend', eur(s.pastSum.total)],
+      ['Ontvangen', eur(s.received)],
       ['Nog te ontvangen', s.open > 0 ? eur(s.open) : '€ 0']
     ];
     var rows = s.list.slice().reverse().map(function (l) {
