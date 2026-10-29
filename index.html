@@ -481,7 +481,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var td = todayStr();
     if (td >= p[0] && td <= p[1]) s = (s ? s + ' · ' : '') + (view === 'day' ? 'vandaag' : view === 'week' ? 'deze week' : view === 'year' ? 'dit jaar' : 'deze maand');
     $('ttl').textContent = t; $('sub').textContent = s;
-    $('today').textContent = 'Vandaag · ' + DAYS_SHORT[(parseYmd(td).getUTCDay() + 6) % 7] + ' ' + shortDate(td) + ' ▾';
+    /* Knop: "Vandaag" als vandaag in beeld is, anders alleen de datum (of week/maand) waar je op staat */
+    var lbl;
+    if (td >= p[0] && td <= p[1]) lbl = 'Vandaag';
+    else if (view === 'day') lbl = DAYS_SHORT[(parseYmd(cursor).getUTCDay() + 6) % 7] + ' ' + shortDate(cursor);
+    else if (view === 'week') lbl = 'Week ' + isoWeek(p[0]);
+    else if (view === 'month') lbl = MON[a.getUTCMonth()] + ' ' + a.getUTCFullYear();
+    else lbl = String(a.getUTCFullYear());
+    $('today').textContent = lbl + ' ▾';
   }
 
   function renderSummary() {
@@ -836,7 +843,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '8 · 30 okt 2026';
+  var BUILD = '9 · 30 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
