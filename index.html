@@ -952,7 +952,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '10 · 30 okt 2026';
+  var BUILD = '11 · 30 okt 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
@@ -1513,7 +1513,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     $('st-sum').replaceChildren(
       stat('Leerlingen', String(all.length), all.filter(function (s) { return s.next; }).length + ' met een geplande les'),
       stat('Nog te ontvangen', eur(open), open > 0 ? 'van ' + cfg.ownName + '-lessen die al geweest zijn' : 'Alles is betaald', open > 0 ? 'warn' : ''),
-      stat('Examens gepland', String(exams), exams ? 'eerstvolgende: ' + dayLabel(all.filter(function (s) { return s.examNext; }).map(function (s) { return s.examNext.date; }).sort()[0]) : 'geen'));
+      stat('Examens gepland', String(exams), exams ? 'eerstvolgende: ' + dayLabel(all.filter(function (s) { return s.examNext; }).map(function (s) { return s.examNext.date; }).sort()[0]) : 'geen'),
+      (function () {
+        /* Ontvangen: lessen die al geweest zijn, behalve eigen lessen die nog niet betaald zijn */
+        var rw = 0, ro = 0;
+        lessons.forEach(function (l) { if (!isPast(l) || isOpenPay(l)) return; if (srcOf(l) === 'own') ro += priceOf(l); else rw += priceOf(l); });
+        return stat('Totaal ontvangen', eur(rw + ro), cfg.workName + ' ' + eur(rw) + ' · ' + cfg.ownName + ' ' + eur(ro), 'good');
+      })());
     var list = all.filter(function (s) { return !q || s.key.indexOf(q) !== -1; });
     list.sort(function (a, b) {
       if (studentSort === 'naam') return a.name.localeCompare(b.name, 'nl');
