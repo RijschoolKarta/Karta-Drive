@@ -485,6 +485,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .inv .ipay { margin: 28px 0 0; }
 .inv .ifoot { margin-top: 36px; padding-top: 10px; border-top: 1px solid #E0E3DE; color: #5B6773; font-size: 8.5pt; }
 .inv tr { break-inside: avoid; }
+.inv .istamp { display: inline-block; margin-top: 10px; border: 2.5px solid #1E8A4C; color: #1E8A4C; border-radius: 6px; padding: 3px 12px; font: 700 15pt/1.2 var(--font-display); letter-spacing: .12em; text-transform: uppercase; transform: rotate(-4deg); }
 @media (max-width: 640px) {
   #page .title h1 { font-size: 26px; }
   .stat .val { font-size: 24px; }
@@ -1052,7 +1053,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '13 · 2 nov 2026';
+  var BUILD = '14 · 2 nov 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
@@ -1730,8 +1731,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         if (on) sel[l.id] = true;
       });
     }
+    if (!o.month && pool.length) o.lastMonth = pool[0].date.slice(0, 7) + '-01';
     if (o.month) pick('month');
     else if (o.src === 'own' && pool.some(function (l) { return !l.paid; })) pick('open');
+    else if (o.lastMonth) { o.month = o.lastMonth; pick('month'); }
     else pick('prev');
     draft = { settings: true };
     var f = { client: o.client || '', caddr: '', no: defaultInvNo(), date: todayStr() };
@@ -1763,7 +1766,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
               h('span', null, [o.key ? null : String(l.name || '').trim(), kindName(l), l.exam ? 'Examen' : null, o.src === 'own' && l.paid ? 'betaald' : null].filter(Boolean).join(' · '))),
             h('span', { class: 'amt' }, eur(priceOf(l))));
         })) : h('div', { class: 'status' }, 'Nog geen lessen die al geweest zijn.'),
-        h('div', { class: 'total' }, h('span', null, list.length + (list.length === 1 ? ' les' : ' lessen') + (rate ? ' · incl. ' + eur(vatIn(tot, rate)) + ' btw' : '')), h('b', null, eur(tot))),
+        o.src === 'own' && list.length && list.every(function (l) { return l.paid; }) ? h('div', { class: 'rcstatus ok' }, 'Deze lessen zijn al betaald: op de factuur komt Betaald te staan, zonder betaalverzoek.') : null,
+      h('div', { class: 'total' }, h('span', null, list.length + (list.length === 1 ? ' les' : ' lessen') + (rate ? ' · incl. ' + eur(vatIn(tot, rate)) + ' btw' : '')), h('b', null, eur(tot))),
         h('div', { class: 'err', id: 'i-err', role: 'alert' }),
         h('div', { class: 'acts' },
           h('button', { class: 'btn primary', type: 'button', onclick: function () { make(list, tot, rate); } }, 'Maak PDF'),
@@ -1775,7 +1779,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       if (!list.length) { $('i-err').textContent = 'Kies minstens één les.'; return; }
       if (!f.client.trim()) { $('i-err').textContent = 'Vul in aan wie de factuur is.'; return; }
       if (!/^\d{4}-\d{2}-\d{2}$/.test(f.date)) { $('i-err').textContent = 'Kies een factuurdatum.'; return; }
-      printInvoice({ no: f.no.trim() || defaultInvNo(), date: f.date, client: f.client.trim(), caddr: f.caddr.trim(), list: list, tot: tot, rate: rate, withName: !o.key });
+      printInvoice({ no: f.no.trim() || defaultInvNo(), date: f.date, client: f.client.trim(), caddr: f.caddr.trim(), list: list, tot: tot, rate: rate, withName: !o.key,
+        paid: o.src === 'own' && list.every(function (l) { return l.paid; }) });
       /* Volgend nummer klaarzetten */
       var m = /(\d+)\s*$/.exec(f.no), n = m ? parseInt(m[1], 10) : NaN;
       if (!isNaN(n) && n + 1 > cfg.invNext) { var st = normSettings(Object.assign({}, cfg, { invNext: n + 1 }), cfg); db.putSettings(st); cfg = st; }
@@ -1808,7 +1813,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
           h('table', null, h('tbody', null,
             h('tr', null, h('td', null, 'Factuurnummer'), h('td', null, v.no)),
             h('tr', null, h('td', null, 'Factuurdatum'), h('td', null, d(v.date))),
-            h('tr', null, h('td', null, 'Vervaldatum'), h('td', null, d(due))))))),
+            v.paid ? null : h('tr', null, h('td', null, 'Vervaldatum'), h('td', null, d(due))))), v.paid ? h('div', { class: 'istamp' }, 'Betaald') : null)),
       h('div', { class: 'ito' }, h('small', null, 'Aan'), h('b', null, v.client), v.caddr ? h('div', null, v.caddr) : null),
       h('table', { class: 'ilines' },
         h('thead', null, h('tr', null, h('th', null, 'Datum'), h('th', null, 'Omschrijving'), h('th', { class: 'r' }, 'Bedrag'))),
@@ -1818,9 +1823,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       h('table', { class: 'itot' }, h('tbody', null,
         v.rate ? h('tr', null, h('td', null, 'Totaal excl. btw'), h('td', { class: 'r' }, eur(excl))) : null,
         v.rate ? h('tr', null, h('td', null, 'Btw ' + v.rate + '%'), h('td', { class: 'r' }, eur(vatIn(v.tot, v.rate)))) : null,
-        h('tr', { class: 'grand' }, h('td', null, 'Te betalen'), h('td', { class: 'r' }, eur(v.tot))))),
+        h('tr', { class: 'grand' }, h('td', null, v.paid ? 'Totaal betaald' : 'Te betalen'), h('td', { class: 'r' }, eur(v.tot))))),
       v.rate ? null : h('p', { class: 'inote' }, 'Er is geen btw in rekening gebracht.'),
-      h('p', { class: 'ipay' }, 'Graag het bedrag vóór ' + d(due) + ' overmaken' + (b.iban ? ' op ' + b.iban : '') + (b.name ? ' ten name van ' + (b.person || b.name) : '') + ', onder vermelding van factuurnummer ' + v.no + '.'),
+      v.paid ? h('p', { class: 'ipay' }, 'Dit bedrag is al betaald. Bedankt!') : h('p', { class: 'ipay' }, 'Graag het bedrag vóór ' + d(due) + ' overmaken' + (b.iban ? ' op ' + b.iban : '') + (b.name ? ' ten name van ' + (b.person || b.name) : '') + ', onder vermelding van factuurnummer ' + v.no + '.'),
       ids.length ? h('div', { class: 'ifoot' }, [b.name].concat(ids).filter(Boolean).join(' · ')) : null);
     $('print').replaceChildren(doc);
     var old = document.title; document.title = 'Factuur ' + v.no + ' ' + v.client;
