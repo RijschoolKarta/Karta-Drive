@@ -423,6 +423,68 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .rcstatus.ok { background: var(--bg); color: var(--ink); }
 .rcstatus.warn { background: var(--ownE-bg); color: var(--ownE-ink); }
 .card input:disabled { opacity: .55; }
+.fld input[type="tel"] { width: 100%; padding: 9px 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--bg); font-size: 16px; }
+.card .fld input[type="email"] { padding: 9px 10px; }
+.bizgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 480px) { .bizgrid { grid-template-columns: minmax(0, 1fr); } }
+.pickrow { cursor: pointer; }
+.pickrow input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); flex: none; }
+
+/* Urencriterium en btw per kwartaal */
+.meter { display: flex; flex-direction: column; gap: 8px; }
+.meter .mtop { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.meter .mtop b { font: 700 26px/1 var(--font-display); }
+.meter .mlbl { font: 600 11px/1.2 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.track { position: relative; height: 12px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--accent); }
+.track i.proj { background: var(--accent-soft); }
+.track i.done { background: #1E8A4C; }
+.qtab { width: 100%; border-collapse: collapse; font-size: 14px; }
+@media (max-width: 480px) { .qtab { font-size: 12.5px; } .qtab th { font-size: 9.5px; letter-spacing: .04em; } }
+.qtab th { font: 600 11px/1.2 var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: right; padding: 4px 0 8px 8px; }
+.qtab th:first-child, .qtab td:first-child { text-align: left; padding-left: 0; }
+.qtab td { text-align: right; padding: 8px 0 8px 8px; border-top: 1px solid var(--line); white-space: nowrap; }
+.qtab tr.cur td:first-child { color: var(--accent); font-weight: 600; }
+.qtab td.pay { font-weight: 700; }
+.qtab td.back { font-weight: 700; color: #1E8A4C; }
+.phead { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.phead .mlbl { font: 600 11px/1.2 var(--font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.btn.wa { display: inline-flex; align-items: center; gap: 6px; }
+.btn.wa svg { width: 16px; height: 16px; color: #1FA855; }
+
+/* Factuur: alleen zichtbaar bij afdrukken / opslaan als PDF */
+#print { display: none; }
+@media print {
+  @page { size: A4; margin: 16mm 16mm 18mm; }
+  :root, body { background: #FFFFFF !important; color: #15202B !important; padding: 0 !important; }
+  body > *:not(#print) { display: none !important; }
+  #print { display: block !important; }
+}
+.inv { font: 400 10.5pt/1.45 var(--font-body); color: #15202B; }
+.inv .ihead { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; }
+.inv .ibrand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.inv .ibrand img { width: 44px; height: 44px; border-radius: 10px; }
+.inv .ibrand b { font: 700 20pt/1 var(--font-display); color: #1B3A8C; }
+.inv .ititle { text-align: right; }
+.inv h1 { font: 700 30pt/1 var(--font-display); margin: 0 0 10px; color: #1B3A8C; letter-spacing: .02em; }
+.inv .ititle td { padding: 1px 0 1px 14px; }
+.inv .ititle td:first-child { color: #5B6773; }
+.inv .ito { margin: 28px 0 22px; padding: 12px 14px; border-left: 3px solid #E07B1A; background: #F6F7F4; }
+.inv .ito small { display: block; color: #5B6773; font-size: 9pt; text-transform: uppercase; letter-spacing: .08em; }
+.inv .ito b { font-size: 12pt; }
+.inv table.ilines { width: 100%; border-collapse: collapse; }
+.inv .ilines th { text-align: left; font-size: 9pt; text-transform: uppercase; letter-spacing: .06em; color: #5B6773; border-bottom: 1.5px solid #1B3A8C; padding: 6px 0; }
+.inv .ilines td { padding: 7px 0; border-bottom: 1px solid #E0E3DE; vertical-align: top; }
+.inv .ilines td + td, .inv .ilines th + th { padding-left: 12px; }
+.inv .r { text-align: right; white-space: nowrap; }
+.inv table.itot { margin: 14px 0 0 auto; min-width: 46%; border-collapse: collapse; }
+.inv .itot td { padding: 4px 0; }
+.inv .itot td + td { padding-left: 24px; }
+.inv .itot tr.grand td { border-top: 1.5px solid #1B3A8C; padding-top: 8px; font-weight: 700; font-size: 13pt; }
+.inv .inote { color: #5B6773; font-size: 9.5pt; margin: 12px 0 0; text-align: right; }
+.inv .ipay { margin: 28px 0 0; }
+.inv .ifoot { margin-top: 36px; padding-top: 10px; border-top: 1px solid #E0E3DE; color: #5B6773; font-size: 8.5pt; }
+.inv tr { break-inside: avoid; }
 @media (max-width: 640px) {
   #page .title h1 { font-size: 26px; }
   .stat .val { font-size: 24px; }
@@ -462,6 +524,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 <div class="gate" id="gate" hidden></div>
 <div class="ov" id="ov" hidden></div>
 <div class="toast" id="toast" hidden></div>
+<div id="print"></div>
 
 <script>
 (function () {
@@ -523,6 +586,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   /* Instellingen per account: namen van de twee rijscholen, prijzen en per hoeveel minuten die prijs geldt */
   var DEFAULTS_LOCAL = { workName: 'Ruzgar', ownName: 'Karta', workPrices: [25], ownPrices: [40, 50], workUnit: 60, ownUnit: 50 };
   var DEFAULTS_NEW = { workName: 'Rijschool', ownName: 'Eigen leerlingen', workPrices: [25], ownPrices: [40, 50], workUnit: 60, ownUnit: 50 };
+  /* Bedrijfsgegevens voor op de factuur */
+  var BIZ_FIELDS = [['name', 'Bedrijfsnaam', 'Bijv. Rijschool Karta'], ['person', 'Je naam', ''], ['addr', 'Adres', 'Straat en huisnummer'], ['city', 'Postcode en plaats', ''],
+    ['kvk', 'KvK-nummer', ''], ['btw', 'Btw-id', 'NL…B01'], ['iban', 'IBAN', 'NL00 BANK 0000 0000 00'], ['mail', 'E-mail', ''], ['tel', 'Telefoon', '']];
   function prices(v, fb) {
     var a = Array.isArray(v) ? v : String(v == null ? '' : v).split(/\s*[;\/]\s*|,\s+|\s+/);
     a = a.map(function (x) { return parseFloat(String(x).replace(',', '.')); }).filter(function (x) { return !isNaN(x) && x >= 0; });
@@ -531,12 +597,22 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
   function normSettings(s, base) {
     s = s || {};
     function u(v, d) { return v === 50 || v === 60 ? v : d; }
+    function vt(v, d) { return v === 0 || v === 21 ? v : d; }
+    var bb = s.biz && typeof s.biz === 'object' ? s.biz : (base.biz || {}), biz = {};
+    BIZ_FIELDS.forEach(function (f) { biz[f[0]] = String(bb[f[0]] == null ? '' : bb[f[0]]).trim().slice(0, 80); });
+    var inv = parseInt(s.invNext, 10), xw = parseFloat(s.extraWeek);
     return {
       workName: String(s.workName || base.workName).trim().slice(0, 30) || base.workName,
       ownName: String(s.ownName || base.ownName).trim().slice(0, 30) || base.ownName,
       workPrices: prices(s.workPrices != null ? s.workPrices : s.rate, base.workPrices),
       ownPrices: prices(s.ownPrices, base.ownPrices),
-      workUnit: u(s.workUnit, base.workUnit), ownUnit: u(s.ownUnit, base.ownUnit)
+      workUnit: u(s.workUnit, base.workUnit), ownUnit: u(s.ownUnit, base.ownUnit),
+      /* Btw: 0 = geen btw, 21 = 21% btw zit al in de prijs */
+      workVat: vt(s.workVat, base.workVat || 0), ownVat: vt(s.ownVat, base.ownVat || 0),
+      biz: biz,
+      invNext: inv >= 1 && inv < 100000 ? inv : (base.invNext || 1),
+      /* Uren naast de lessen (administratie, reistijd) voor het urencriterium */
+      extraWeek: xw >= 0 && xw <= 60 ? Math.round(xw * 2) / 2 : (base.extraWeek || 0)
     };
   }
   var cfg = normSettings(null, DEFAULTS_LOCAL);
@@ -898,6 +974,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Annuleren'),
         h('span', { class: 'sp' }),
         isNew ? null : h('button', { class: 'btn', type: 'button', onclick: copyNextWeek }, 'Zelfde les volgende week'),
+        isNew || draft.date < todayStr() ? null : (function () {
+          var b = h('button', { class: 'btn wa', type: 'button', onclick: function () {
+            var x = bodyFromDraft(); if (typeof x === 'string') { $('m-err').textContent = x; return; } remind(x); } });
+          b.innerHTML = WA_ICON; b.append('Herinnering');
+          return b;
+        })(),
         isNew ? null : h('button', { class: 'btn danger', type: 'button', id: 'm-del', onclick: delLesson }, 'Verwijderen')));
     $('ov').replaceChildren(form); $('ov').hidden = false;
     refreshChips();
@@ -930,6 +1012,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     try { await db.put(newId(), b); toast('Gekopieerd naar ' + shortDate(b.date)); }
     catch (err) { $('m-err').textContent = 'Kopiëren lukt niet. Probeer het zo nog eens.'; }
   }
+  /* Herinnering: opent WhatsApp met een kant-en-klaar bericht; je kiest zelf de leerling */
+  var WA_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 2.5 4.3 5 5l1.2-1.2-2-1-.8.8c-.9-.4-1.6-1.1-2-2l.8-.8-1-2z"/></svg>';
+  function remindText(l) {
+    var first = String(l.name || '').trim().split(/\s+/)[0] || '', td = todayStr(), when;
+    if (l.date === td) when = 'vandaag';
+    else if (l.date === addDays(td, 1)) when = 'morgen';
+    else when = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'][(parseYmd(l.date).getUTCDay() + 6) % 7] + ' ' + parseYmd(l.date).getUTCDate() + ' ' + MON_LONG[parseYmd(l.date).getUTCMonth()];
+    var what = l.exam ? 'je praktijkexamen' : (dur(l) >= 2 * UNIT ? 'een blokuur rijles' : 'rijles');
+    var sign = cfg.biz.person || cfg.biz.name || '';
+    return 'Hoi' + (first ? ' ' + first : '') + ', even een herinnering: ' + when + ' om ' + l.start + ' heb je ' + what + ' (tot ' + l.end + ').' +
+      (l.exam ? ' Succes alvast, je kunt het!' : ' Tot dan!') + (sign ? '\n\n' + sign : '');
+  }
+  function remind(l) { window.open('https://wa.me/?text=' + encodeURIComponent(remindText(l)), '_blank', 'noopener'); }
   async function delLesson() {
     if (!confirmDel) { confirmDel = true; $('m-del').textContent = 'Zeker weten? Verwijder'; return; }
     try { await db.remove(draft.id); closeModal(); }
@@ -957,7 +1052,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 
   /* ---------- opslag: online per account (Firebase), of op dit toestel als er nog geen database gekoppeld is ---------- */
   var STORE_KEY = 'rijlesplanner-v1';
-  var BUILD = '12 · 30 okt 2026';
+  var BUILD = '13 · 2 nov 2026';
   var FB = window.KARTA_FIREBASE || null;
   var CLOUD_WANTED = !!(FB && FB.apiKey && FB.projectId);
   var CLOUD = CLOUD_WANTED && !!window.firebase;
@@ -1120,14 +1215,16 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     $('ov').replaceChildren(accountCard(welcome, false)); $('ov').hidden = false;
   }
   function accountCard(welcome, inPage) {
-    var f = { workUnit: cfg.workUnit, ownUnit: cfg.ownUnit };
-    function unitSeg(key, label) {
-      var bs = [50, 60].map(function (m) {
+    var f = { workUnit: cfg.workUnit, ownUnit: cfg.ownUnit, workVat: cfg.workVat, ownVat: cfg.ownVat };
+    function segOf(key, label, vals, txt) {
+      var bs = vals.map(function (m, i) {
         return h('button', { type: 'button', 'aria-pressed': f[key] === m ? 'true' : 'false', onclick: function () {
-          f[key] = m; bs.forEach(function (b, i) { b.setAttribute('aria-pressed', [50, 60][i] === m ? 'true' : 'false'); }); } }, m + ' min');
+          f[key] = m; bs.forEach(function (b, j) { b.setAttribute('aria-pressed', vals[j] === m ? 'true' : 'false'); }); } }, txt[i]);
       });
       return h('div', { class: 'fld' }, h('span', { class: 'l' }, label), h('div', { class: 'seg', role: 'group', 'aria-label': label }, bs));
     }
+    function unitSeg(key, label) { return segOf(key, label, [50, 60], ['50 min', '60 min']); }
+    function vatSeg(key) { return segOf(key, 'Btw', [0, 21], ['Geen btw', '21% (in de prijs)']); }
     /* Elke prijs een eigen vakje: geen komma's of spaties nodig op het cijfertoetsenbord */
     function priceEditor(k, list) {
       var box = h('div', { class: 'prices', id: 's-' + k + 'p' });
@@ -1153,7 +1250,21 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         h('div', { class: 'fld' }, h('label', { for: 's-' + k + 'n' }, 'Naam'),
           h('input', { type: 'text', id: 's-' + k + 'n', autocomplete: 'off', maxlength: '30', value: src === 'work' ? cfg.workName : cfg.ownName })),
         priceEditor(k, src === 'work' ? cfg.workPrices : cfg.ownPrices),
-        unitSeg(src === 'work' ? 'workUnit' : 'ownUnit', 'Prijs geldt per'));
+        unitSeg(src === 'work' ? 'workUnit' : 'ownUnit', 'Prijs geldt per'),
+        inPage ? vatSeg(src === 'work' ? 'workVat' : 'ownVat') : null);
+    }
+    function bizBlock() {
+      return [h('h3', null, 'Bedrijfsgegevens (voor facturen)'),
+        h('div', { class: 'bizgrid' }, BIZ_FIELDS.map(function (b) {
+          return h('div', { class: 'fld' }, h('label', { for: 's-b-' + b[0] }, b[1]),
+            h('input', { type: b[0] === 'mail' ? 'email' : b[0] === 'tel' ? 'tel' : 'text', id: 's-b-' + b[0], autocomplete: 'off', maxlength: '80', placeholder: b[2], value: cfg.biz[b[0]] || '' }));
+        })),
+        h('div', { class: 'row2' },
+          h('div', { class: 'fld' }, h('label', { for: 's-inv' }, 'Volgend factuurnummer'),
+            h('input', { type: 'number', id: 's-inv', min: '1', step: '1', inputmode: 'numeric', value: String(cfg.invNext) })),
+          h('div', { class: 'fld' }, h('label', { for: 's-xw' }, 'Overige werkuren per week'),
+            h('input', { type: 'number', id: 's-xw', min: '0', max: '60', step: '0.5', inputmode: 'decimal', value: String(cfg.extraWeek) }))),
+        h('p', { class: 'hint' }, 'Overige werkuren zijn uren naast je lessen, zoals administratie, reistijd en lessen plannen. Ze tellen mee voor het urencriterium op de pagina Inkomsten. Of je btw moet rekenen hangt af van je situatie (bijv. de KOR); vraag het bij twijfel na bij je boekhouder.')];
     }
     var n = localCount(), canMove = user && n && !store('rp-moved-' + user.uid);
     return h('form', { class: 'card' + (inPage ? ' flat' : ''), onsubmit: function (e) { e.preventDefault(); saveSettings(f, welcome); } },
@@ -1165,6 +1276,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       school('w', 'work', 'Blauwe lessen'),
       school('o', 'own', 'Oranje lessen'),
       h('p', { class: 'hint' }, 'Tik op + Prijs om een bedrag toe te voegen. Lessen die al in je agenda staan houden hun eigen prijs.'),
+      inPage ? bizBlock() : null,
       h('div', { class: 'err', id: 's-err', role: 'alert' }),
       h('div', { class: 'acts' },
         h('button', { class: 'btn primary', type: 'submit' }, welcome ? 'Klaar' : 'Opslaan'),
@@ -1184,7 +1296,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var wp = collect('s-wp'), op = collect('s-op');
     if (!wn || !on) { err.textContent = 'Vul bij allebei een naam in.'; return; }
     if (!wp.length || !op.length) { err.textContent = 'Vul bij allebei een prijs in.'; return; }
-    var st = normSettings({ workName: wn, ownName: on, workPrices: wp, ownPrices: op, workUnit: f.workUnit, ownUnit: f.ownUnit }, cfg);
+    var raw = { workName: wn, ownName: on, workPrices: wp, ownPrices: op, workUnit: f.workUnit, ownUnit: f.ownUnit, workVat: f.workVat, ownVat: f.ownVat };
+    if ($('s-inv')) {
+      raw.biz = {}; BIZ_FIELDS.forEach(function (b) { raw.biz[b[0]] = $('s-b-' + b[0]).value; });
+      raw.invNext = $('s-inv').value; raw.extraWeek = String($('s-xw').value).replace(',', '.');
+    }
+    var st = normSettings(raw, cfg);
     db.putSettings(st); cfg = st; settingsExist = true;
     closeModal(); render(); toast(welcome ? 'Klaar! Tik op + Les om je eerste les te plannen.' : 'Opgeslagen');
   }
@@ -1577,6 +1694,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       h('div', { class: 'facts' }, facts.map(function (f) { return h('div', { class: 'fact' + (f[0] === 'Nog te ontvangen' && s.open > 0 ? ' warn' : '') }, h('small', null, f[0]), h('b', null, f[1])); })),
       s.open > 0 ? h('div', { class: 'acts' }, h('button', { class: 'btn primary', type: 'button', onclick: function () {
         setPaid(s.openList, true); toast(s.name + ': alles betaald'); setTimeout(function () { openStudent(key); }, 80); } }, 'Alles betaald (' + eur(s.open) + ')')) : null,
+      s.list.some(function (l) { return srcOf(l) === 'own' && isPast(l); }) ? h('div', { class: 'acts' },
+        h('button', { class: 'btn', type: 'button', onclick: function () { openInvoice({ src: 'own', key: key, client: s.name }); } }, 'Factuur maken'),
+        s.next ? h('button', { class: 'btn', type: 'button', onclick: function () { remind(s.next); } }, 'Herinnering volgende les') : null) :
+        s.next ? h('div', { class: 'acts' }, h('button', { class: 'btn', type: 'button', onclick: function () { remind(s.next); } }, 'Herinnering volgende les')) : null,
       h('h3', null, 'Lessen'),
       h('div', { class: 'llist' }, rows),
       h('p', { class: 'hint' }, 'Tik op een les om hem te wijzigen. Alleen ' + cfg.ownName + '-lessen hoeven bij jou betaald te worden.'),
@@ -1586,6 +1707,128 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
         h('span', { class: 'sp' }),
         h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten'))));
     $('ov').hidden = false;
+  }
+
+  /* ---------- facturen: per leerling of per maand aan de rijschool, als PDF (via afdrukken / delen) ---------- */
+  function vatOf(src) { return src === 'own' ? cfg.ownVat : cfg.workVat; }
+  function vatIn(amount, rate) { return rate ? Math.round(amount * rate / (100 + rate) * 100) / 100 : 0; }
+  function pad3(n) { return n < 10 ? '00' + n : n < 100 ? '0' + n : String(n); }
+  function defaultInvNo() { return todayStr().slice(0, 4) + '-' + pad3(cfg.invNext); }
+  function lessonText(l, withName) {
+    var t = l.exam ? 'Praktijkexamen' : 'Rijles ' + kindName(l).toLowerCase();
+    return t + (withName && l.name ? ' · ' + String(l.name).trim() : '') + ' · ' + l.start + '–' + l.end;
+  }
+  function openInvoice(o) {
+    var pool = lessons.filter(function (l) { return srcOf(l) === o.src && isPast(l) && (!o.key || studentKey(l.name) === o.key); }).sort(byWhen).reverse();
+    var sel = {}, mode = '';
+    var thisM = todayStr().slice(0, 7), prevM = addMonths(todayStr(), -1).slice(0, 7);
+    function pick(m) {
+      mode = m; sel = {};
+      pool.forEach(function (l) {
+        var on = m === 'open' ? !l.paid : m === 'this' ? l.date.slice(0, 7) === thisM : m === 'prev' ? l.date.slice(0, 7) === prevM
+          : m === 'month' ? l.date.slice(0, 7) === o.month.slice(0, 7) : true;
+        if (on) sel[l.id] = true;
+      });
+    }
+    if (o.month) pick('month');
+    else if (o.src === 'own' && pool.some(function (l) { return !l.paid; })) pick('open');
+    else pick('prev');
+    draft = { settings: true };
+    var f = { client: o.client || '', caddr: '', no: defaultInvNo(), date: todayStr() };
+    function chosen() { return pool.filter(function (l) { return sel[l.id]; }).sort(byWhen); }
+    function build() {
+      var list = chosen(), tot = list.reduce(function (t, l) { return t + priceOf(l); }, 0), rate = vatOf(o.src);
+      var modes = (o.src === 'own' ? [['open', 'Nog niet betaald']] : []).concat(o.month ? [['month', MON_LONG[parseYmd(o.month).getUTCMonth()]]] : [])
+        .concat([['this', 'Deze maand'], ['prev', 'Vorige maand'], ['all', 'Alles']]);
+      var missing = !cfg.biz.name || !cfg.biz.iban;
+      function inp(id, key, label, type, ph) {
+        return h('div', { class: 'fld' }, h('label', { for: id }, label),
+          h('input', { type: type || 'text', id: id, autocomplete: 'off', placeholder: ph || '', value: f[key], oninput: function (e) { f[key] = e.target.value; } }));
+      }
+      $('ov').replaceChildren(h('div', { class: 'card' },
+        h('h2', null, 'Factuur maken'),
+        missing ? h('div', { class: 'rcstatus warn' }, 'Vul eerst je bedrijfsnaam en IBAN in bij Instellingen, dan staan ze op de factuur. ',
+          h('button', { type: 'button', class: 'linkbtn', onclick: function () { closeModal(); go('instellingen'); } }, 'Naar Instellingen')) : null,
+        h('div', { class: 'row2 dates' }, inp('i-no', 'no', 'Factuurnummer'), inp('i-date', 'date', 'Factuurdatum', 'date')),
+        inp('i-client', 'client', 'Aan'),
+        inp('i-caddr', 'caddr', 'Adres klant (optioneel)', 'text', 'Straat, postcode en plaats'),
+        h('div', { class: 'fld' }, h('span', { class: 'l' }, 'Welke lessen'),
+          h('div', { class: 'chips' }, modes.map(function (m) {
+            return h('button', { type: 'button', class: 'chip', 'aria-pressed': mode === m[0] ? 'true' : 'false', onclick: function () { pick(m[0]); build(); } }, m[1]);
+          }))),
+        pool.length ? h('div', { class: 'llist' }, pool.map(function (l) {
+          return h('label', { class: 'lrow pickrow' },
+            h('input', { type: 'checkbox', checked: !!sel[l.id], onchange: function (e) { if (e.target.checked) sel[l.id] = true; else delete sel[l.id]; mode = ''; build(); } }),
+            h('span', { class: 'lmain' }, h('b', null, dayLabel(l.date) + ' ' + parseYmd(l.date).getUTCFullYear() + ' · ' + l.start),
+              h('span', null, [o.key ? null : String(l.name || '').trim(), kindName(l), l.exam ? 'Examen' : null, o.src === 'own' && l.paid ? 'betaald' : null].filter(Boolean).join(' · '))),
+            h('span', { class: 'amt' }, eur(priceOf(l))));
+        })) : h('div', { class: 'status' }, 'Nog geen lessen die al geweest zijn.'),
+        h('div', { class: 'total' }, h('span', null, list.length + (list.length === 1 ? ' les' : ' lessen') + (rate ? ' · incl. ' + eur(vatIn(tot, rate)) + ' btw' : '')), h('b', null, eur(tot))),
+        h('div', { class: 'err', id: 'i-err', role: 'alert' }),
+        h('div', { class: 'acts' },
+          h('button', { class: 'btn primary', type: 'button', onclick: function () { make(list, tot, rate); } }, 'Maak PDF'),
+          h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Annuleren')),
+        h('p', { class: 'hint' }, 'Je telefoon opent het deelmenu of afdrukvenster: kies daar Bewaar als PDF of deel hem direct via WhatsApp of mail.')));
+      $('ov').hidden = false;
+    }
+    function make(list, tot, rate) {
+      if (!list.length) { $('i-err').textContent = 'Kies minstens één les.'; return; }
+      if (!f.client.trim()) { $('i-err').textContent = 'Vul in aan wie de factuur is.'; return; }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(f.date)) { $('i-err').textContent = 'Kies een factuurdatum.'; return; }
+      printInvoice({ no: f.no.trim() || defaultInvNo(), date: f.date, client: f.client.trim(), caddr: f.caddr.trim(), list: list, tot: tot, rate: rate, withName: !o.key });
+      /* Volgend nummer klaarzetten */
+      var m = /(\d+)\s*$/.exec(f.no), n = m ? parseInt(m[1], 10) : NaN;
+      if (!isNaN(n) && n + 1 > cfg.invNext) { var st = normSettings(Object.assign({}, cfg, { invNext: n + 1 }), cfg); db.putSettings(st); cfg = st; }
+      var unpaid = o.src === 'own' ? list.filter(function (l) { return !l.paid; }) : [];
+      $('ov').replaceChildren(h('div', { class: 'card' },
+        h('h2', null, 'Factuur ' + (f.no.trim() || '') + ' is klaar'),
+        h('p', null, 'Totaal ' + eur(tot) + ' voor ' + list.length + (list.length === 1 ? ' les' : ' lessen') + ' aan ' + f.client.trim() + '.'),
+        h('div', { class: 'acts' },
+          unpaid.length ? h('button', { class: 'btn primary', type: 'button', onclick: function () { setPaid(unpaid, true); toast('Gemarkeerd als betaald'); closeModal(); } }, 'Markeer als betaald') : null,
+          h('button', { class: 'btn', type: 'button', onclick: function () { printInvoice(lastInvoice); } }, 'Opnieuw openen'),
+          h('span', { class: 'sp' }),
+          h('button', { class: 'btn', type: 'button', onclick: closeModal }, 'Sluiten')),
+        unpaid.length ? h('p', { class: 'hint' }, 'Markeer de lessen pas als betaald als het geld binnen is. Dat kan ook later bij de leerling.') : null));
+    }
+    build();
+  }
+  var lastInvoice = null;
+  function printInvoice(v) {
+    lastInvoice = v;
+    var b = cfg.biz, due = addDays(v.date, 14), excl = Math.round((v.tot - vatIn(v.tot, v.rate)) * 100) / 100;
+    function d(s) { var x = parseYmd(s); return x.getUTCDate() + ' ' + MON_LONG[x.getUTCMonth()] + ' ' + x.getUTCFullYear(); }
+    var from = [b.person && b.person !== b.name ? b.person : null, b.addr, b.city].filter(Boolean);
+    var ids = [b.kvk ? 'KvK ' + b.kvk : null, b.btw ? 'Btw-id ' + b.btw : null, b.iban ? 'IBAN ' + b.iban : null].filter(Boolean);
+    var contact = [b.mail, b.tel].filter(Boolean);
+    var doc = h('div', { class: 'inv' },
+      h('div', { class: 'ihead' },
+        h('div', null, h('div', { class: 'ibrand' }, h('img', { src: 'icon-192.png', alt: '' }), h('b', null, b.name || cfg.ownName)),
+          from.map(function (x) { return h('div', null, x); }), contact.length ? h('div', null, contact.join(' · ')) : null),
+        h('div', { class: 'ititle' }, h('h1', null, 'Factuur'),
+          h('table', null, h('tbody', null,
+            h('tr', null, h('td', null, 'Factuurnummer'), h('td', null, v.no)),
+            h('tr', null, h('td', null, 'Factuurdatum'), h('td', null, d(v.date))),
+            h('tr', null, h('td', null, 'Vervaldatum'), h('td', null, d(due))))))),
+      h('div', { class: 'ito' }, h('small', null, 'Aan'), h('b', null, v.client), v.caddr ? h('div', null, v.caddr) : null),
+      h('table', { class: 'ilines' },
+        h('thead', null, h('tr', null, h('th', null, 'Datum'), h('th', null, 'Omschrijving'), h('th', { class: 'r' }, 'Bedrag'))),
+        h('tbody', null, v.list.map(function (l) {
+          return h('tr', null, h('td', null, d(l.date)), h('td', null, lessonText(l, v.withName)), h('td', { class: 'r' }, eur(priceOf(l))));
+        }))),
+      h('table', { class: 'itot' }, h('tbody', null,
+        v.rate ? h('tr', null, h('td', null, 'Totaal excl. btw'), h('td', { class: 'r' }, eur(excl))) : null,
+        v.rate ? h('tr', null, h('td', null, 'Btw ' + v.rate + '%'), h('td', { class: 'r' }, eur(vatIn(v.tot, v.rate)))) : null,
+        h('tr', { class: 'grand' }, h('td', null, 'Te betalen'), h('td', { class: 'r' }, eur(v.tot))))),
+      v.rate ? null : h('p', { class: 'inote' }, 'Er is geen btw in rekening gebracht.'),
+      h('p', { class: 'ipay' }, 'Graag het bedrag vóór ' + d(due) + ' overmaken' + (b.iban ? ' op ' + b.iban : '') + (b.name ? ' ten name van ' + (b.person || b.name) : '') + ', onder vermelding van factuurnummer ' + v.no + '.'),
+      ids.length ? h('div', { class: 'ifoot' }, [b.name].concat(ids).filter(Boolean).join(' · ')) : null);
+    $('print').replaceChildren(doc);
+    var old = document.title; document.title = 'Factuur ' + v.no + ' ' + v.client;
+    function back() { document.title = old; window.removeEventListener('afterprint', back); }
+    window.addEventListener('afterprint', back);
+    var img = doc.querySelector('img');
+    function go2() { try { window.print(); } catch (e) { toast('Afdrukken lukt hier niet. Open de app in Safari of Chrome.'); } setTimeout(back, 60000); }
+    if (img && !img.complete) { img.onload = img.onerror = go2; } else go2();
   }
 
   /* ---------- inkomsten ---------- */
@@ -1603,12 +1846,57 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
       months.push({ first: mf, s: ms, cost: mc }); max = Math.max(max, ms.total);
     }
     var cur = todayStr().slice(0, 7);
+    /* Urencriterium: 1225 uur per jaar (lesuren + overige werkuren per week) */
+    var NEED = 1225, td = todayStr(), cy = Number(td.slice(0, 4));
+    var daysY = (Date.UTC(y + 1, 0, 1) - Date.UTC(y, 0, 1)) / 86400000;
+    var dayNo = y < cy ? daysY : y > cy ? 0 : (parseYmd(td) - parseYmd(first)) / 86400000 + 1;
+    var lessonH = lessonsBetween(first, y === cy ? td : last).filter(function (l) { return y !== cy || isPast(l); }).reduce(function (t, l) { return t + dur(l); }, 0) / 60;
+    var extraH = cfg.extraWeek * dayNo / 7, hrs = lessonH + extraH;
+    var proj = y === cy && dayNo > 14 ? hrs / dayNo * daysY : null;
+    function n0(x) { return new Intl.NumberFormat('nl-NL', { maximumFractionDigits: 0 }).format(x); }
+    var meter = h('div', { class: 'panel meter' },
+      h('div', { class: 'mtop' }, h('span', { class: 'mlbl' }, 'Urencriterium ' + y), h('span', null, h('b', null, n0(hrs)), ' van ' + n0(NEED) + ' uur')),
+      h('div', { class: 'track', role: 'img', 'aria-label': n0(hrs) + ' van ' + NEED + ' uur' },
+        proj ? h('i', { class: 'proj', style: 'width:' + Math.min(100, proj / NEED * 100) + '%' }) : null,
+        h('i', { class: hrs >= NEED ? 'done' : '', style: 'width:' + Math.min(100, hrs / NEED * 100) + '%' })),
+      h('span', { class: 'hint' }, hrs >= NEED ? 'Gehaald! Je zit boven de 1.225 uur.' :
+        proj ? 'Op dit tempo kom je eind ' + y + ' op ongeveer ' + n0(proj) + ' uur' + (proj >= NEED ? ', genoeg voor het urencriterium.' : '. Nog ' + n0(NEED - hrs) + ' uur nodig, ongeveer ' + n0((NEED - hrs) / Math.max(1, (daysY - dayNo) / 7)) + ' per week.') :
+        'Nog ' + n0(Math.max(0, NEED - hrs)) + ' uur te gaan.'),
+      h('span', { class: 'hint' }, n0(lessonH) + ' lesuren' + (cfg.extraWeek ? ' + ' + n0(extraH) + ' overige uren (' + fmtNum(cfg.extraWeek) + ' per week)' : '. Tel ook administratie en reistijd mee via Instellingen → Overige werkuren per week.')));
+    /* Btw per kwartaal: btw in je lesprijzen min de btw op je bonnen */
+    var anyVat = cfg.workVat || cfg.ownVat, qrows = [];
+    for (var q = 0; q < 4; q++) {
+      var qf = y + '-' + pad(q * 3 + 1) + '-01', ql = addDays(addMonths(qf, 3), -1);
+      var qls = lessonsBetween(qf, ql), qrc = receipts.filter(function (r) { return r.date >= qf && r.date <= ql; });
+      var omz = qls.reduce(function (t, l) { return t + priceOf(l); }, 0);
+      var vOut = qls.reduce(function (t, l) { return t + vatIn(priceOf(l), vatOf(srcOf(l))); }, 0);
+      var vIn = qrc.reduce(function (t, r) { return t + (r.vat || 0); }, 0);
+      qrows.push({ q: q + 1, cur: td >= qf && td <= ql, omz: omz, out: vOut, inn: vIn, saldo: Math.round((vOut - vIn) * 100) / 100 });
+    }
+    var qpanel = h('div', { class: 'panel' },
+      h('div', { class: 'phead' }, h('span', { class: 'mlbl' }, 'Btw per kwartaal')),
+      h('div', { style: 'overflow-x:auto' }, h('table', { class: 'qtab' },
+        h('thead', null, h('tr', null, h('th', null, ''), h('th', null, 'Omzet'), anyVat ? h('th', null, 'Btw lessen') : null, h('th', null, anyVat ? 'Btw bonnen' : 'Btw terug (bonnen)'), anyVat ? h('th', null, 'Saldo') : null)),
+        h('tbody', null, qrows.map(function (r) {
+          var pay = r.saldo >= 0;
+          return h('tr', { class: r.cur ? 'cur' : '' }, h('td', null, 'K' + r.q), h('td', null, eur(r.omz)), anyVat ? h('td', null, eur(r.out)) : null,
+            h('td', { class: anyVat ? '' : 'back' }, eur(r.inn)),
+            anyVat ? h('td', { class: pay ? 'pay' : 'back' }, eur(Math.abs(r.saldo))) : null);
+        })))),
+      h('p', { class: 'hint' }, anyVat ? 'Saldo in zwart betaal je, in groen krijg je terug. Btw lessen is de 21% die al in je lesprijzen zit. Gebruik dit als hulp bij je btw-aangifte; laat het bij twijfel checken door je boekhouder.'
+        : 'Je rekent nu geen btw over je lessen. Klopt dat niet, zet dan 21% aan per rijschool bij Instellingen.'));
+    var invBtns = h('div', { class: 'acts' },
+      h('button', { class: 'btn', type: 'button', onclick: function () { openInvoice({ src: 'work', client: cfg.workName, month: addMonths(todayStr(), -1) }); } }, 'Factuur naar ' + cfg.workName),
+      h('button', { class: 'btn', type: 'button', onclick: function () { go('leerlingen'); } }, 'Factuur aan een leerling'));
     $('pbody').replaceChildren(
       h('div', { class: 'stats' },
         stat('Verdiend in ' + y, eur(s.total), cfg.workName + ' ' + eur(s.work) + ' · ' + cfg.ownName + ' ' + eur(s.own)),
         stat('Uren', fmtH(s.min), '(' + s.min + ' min)'),
         stat('Lessen', String(s.n), yl.filter(function (l) { return dur(l) === 2 * UNIT; }).length + ' blokuur · ' + yl.filter(function (l) { return dur(l) === UNIT; }).length + ' enkel · ' + ex + (ex === 1 ? ' examen' : ' examens')),
         stat('Kosten (bonnen)', eur(cost), yr.length ? eur(vat) + ' btw terug te vragen' : 'nog geen bonnen')),
+      invBtns,
+      meter,
+      qpanel,
       h('div', { class: 'slist months' },
         h('div', { class: 'mhead' }, h('span', null, 'Per maand'), h('span', { class: 'mleg' }, h('i', { class: 'dot work' }), cfg.workName, h('i', { class: 'dot own' }), cfg.ownName)),
         months.map(function (mo) {
