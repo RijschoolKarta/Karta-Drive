@@ -1052,6 +1052,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var t = payText(l), amt = eur(priceOf(l));
     copyText(t).then(function (ok) {
       toast(ok ? 'Gekopieerd: "' + t + '" · bedrag ' + amt : 'Kopiëren lukte niet: ' + t);
+      /* iPhone/iPad: start de opdracht "ING" in de Opdrachten-app, die de ING-app opent */
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+        setTimeout(function () { window.location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent('ING'); }, 700);
     });
   }
   function remind(l) { window.open('https://wa.me/?text=' + encodeURIComponent(remindText(l)), '_blank', 'noopener'); }
