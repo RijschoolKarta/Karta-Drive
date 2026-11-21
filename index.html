@@ -200,7 +200,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .acts .sp { flex: 1; }
 .err { color: var(--danger); font-size: 13px; }
 .hint { font-size: 12px; color: var(--muted); }
-.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 99px; z-index: 60; font-size: 14px; }
+.toast { max-width: calc(100vw - 32px); text-align: center; position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 99px; z-index: 60; font-size: 14px; }
 .toast[hidden] { display: none; }
 .status { padding: 40px 16px; text-align: center; color: var(--muted); }
 
@@ -981,6 +981,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
           b.innerHTML = WA_ICON; b.append('Herinnering');
           return b;
         })(),
+        isNew || draft.source !== 'own' ? null : h('button', { class: 'btn', type: 'button', onclick: function () {
+          var x = bodyFromDraft(); if (typeof x === 'string') { $('m-err').textContent = x; return; } x.id = draft.id; payRequest(x); } }, '€ Betaalverzoek'),
         isNew ? null : h('button', { class: 'btn danger', type: 'button', id: 'm-del', onclick: delLesson }, 'Verwijderen')));
     $('ov').replaceChildren(form); $('ov').hidden = false;
     refreshChips();
@@ -1024,6 +1026,33 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     var sign = cfg.biz.person || cfg.biz.name || '';
     return 'Hoi' + (first ? ' ' + first : '') + ', even een herinnering: ' + when + ' om ' + l.start + ' heb je ' + what + ' (tot ' + l.end + ').' +
       (l.exam ? ' Succes alvast, je kunt het!' : ' Tot dan!') + (sign ? '\n\n' + sign : '');
+  }
+  /* Betaalverzoek: maakt de omschrijving "DD-MM-JJJJ les N naam" en kopieert die, zodat je hem in je bank-app plakt */
+  function lessonNr(l) {
+    var k = studentKey(l.name);
+    var list = lessons.filter(function (x) { return x.id !== l.id && studentKey(x.name) === k && !x.exam; });
+    if (!l.exam) list.push(l);
+    list.sort(byWhen);
+    return list.indexOf(l) + 1;
+  }
+  function payText(l) {
+    var p = l.date.split('-'), d = p[2] + '-' + p[1] + '-' + p[0];
+    return (d + ' ' + (l.exam ? 'examen' : 'les ' + lessonNr(l)) + ' ' + String(l.name).trim().replace(/\s+/g, ' ')).slice(0, 100);
+  }
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t).then(function () { return true; }, function () { return copyOld(t); });
+    return Promise.resolve(copyOld(t));
+  }
+  function copyOld(t) {
+    var ta = h('textarea', { readonly: '' }); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.append(ta); ta.select(); ta.setSelectionRange(0, t.length);
+    var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); return ok;
+  }
+  function payRequest(l) {
+    var t = payText(l), amt = eur(priceOf(l));
+    copyText(t).then(function (ok) {
+      toast(ok ? 'Gekopieerd: "' + t + '" · bedrag ' + amt : 'Kopiëren lukte niet: ' + t);
+    });
   }
   function remind(l) { window.open('https://wa.me/?text=' + encodeURIComponent(remindText(l)), '_blank', 'noopener'); }
   async function delLesson() {
@@ -1686,6 +1715,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
           h('b', null, dayLabel(l.date) + ' ' + parseYmd(l.date).getUTCFullYear() + ' · ' + l.start),
           h('span', null, [srcOf(l) === 'own' ? cfg.ownName : cfg.workName, kindName(l)].concat(l.exam ? ['Examen'] : []).concat(past ? [] : ['gepland']).join(' · '))),
         h('span', { class: 'amt' }, eur(priceOf(l))),
+        own && !l.paid ? h('button', { type: 'button', class: 'chip', title: 'Omschrijving betaalverzoek kopiëren', 'aria-label': 'Betaalverzoek kopiëren', onclick: function () { payRequest(l); } }, '€') : null,
         own ? h('label', { class: 'paid' }, h('input', { type: 'checkbox', checked: !!l.paid, onchange: function (e) {
           setPaid([l], e.target.checked); setTimeout(function () { openStudent(key); }, 80); } }), 'Betaald') :
           h('span', { class: 'paid na', title: 'Wordt via ' + cfg.workName + ' betaald' }, cfg.workName));
